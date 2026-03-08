@@ -8,13 +8,11 @@ const messageSchema = new mongoose.Schema({
     },
     party: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Party',
-        required: true,
+        ref: 'Party'
     },
     quest: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Quest',
-        default: null,
+        ref: 'Quest'
     },
     sender: {
         type: mongoose.Schema.Types.ObjectId,

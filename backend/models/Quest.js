@@ -21,7 +21,6 @@ const questSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
-    // temporary muna ...?
     difficulty: {
         type: String,
         enum: ['easy', 'medium', 'hard'],
@@ -35,6 +34,16 @@ const questSchema = new mongoose.Schema({
         enum: ['open', 'in_progress', 'completed', 'cancelled'],
         default: 'open',
     },
+    githubRepo: {
+        owner: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        }
+    }
 },
     { timestamps: true }
 

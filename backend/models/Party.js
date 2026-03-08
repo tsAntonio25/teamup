@@ -13,7 +13,7 @@ const PartySchema = new mongoose.Schema({
         default: '',
         maxLength: 500
     },
-    partMaster: {
+    partyMaster: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true

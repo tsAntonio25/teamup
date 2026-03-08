@@ -3,7 +3,10 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { connectDB } from './db/db.js';
+import { connectDB } from './config/db.js';
+import githubRoutes from "./routes/githubRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
 
 dotenv.config();
 
@@ -20,6 +23,10 @@ connectDB();
 app.get('/', (req, res) => {
     res.send('TeamUP! Backend is running');
 });
+
+app.use("/api/auth", authRoutes);
+app.use("/api/github", githubRoutes);
+
 
 // Server
 app.listen(process.env.PORT, () => {
