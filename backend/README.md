@@ -16,10 +16,14 @@ Backend Folder of the Project
 
 * JWT (Json Web Token)
 
+* Axios
+
+* Bcrypt
+
 To install the following dependencies, run the following command inside the folder  
 
 ```bash
-npm i npm i express cors mongoose body-parser express-async-handler jsonwebtoken
+npm i npm i express cors mongoose body-parser express-async-handler jsonwebtoken axios bcrypt
 ```
 
 To run the server, run the following command:
