@@ -1,34 +1,36 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
+
+// import routes
 import githubRoutes from "./routes/githubRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-
+import questRoutes from "./routes/questRoutes.js";
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
+// middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Connect MongoDB
+// connect MongoDB
 connectDB();
 
-// Routes
+// route
 app.get('/', (req, res) => {
     res.send('TeamUP! Backend is running');
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/github", githubRoutes);
+app.use("/api/quests", questRoutes);
 
 
-// Server
+// start server
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 }); 

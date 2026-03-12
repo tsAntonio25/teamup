@@ -1,5 +1,6 @@
 import { getRepoCommits } from "../services/githubService.js";
 
+// get commits for a specific quest
 export const getQuestCommits = async (req, res) => {
     try {
         const { owner, repo, username } = req.params;

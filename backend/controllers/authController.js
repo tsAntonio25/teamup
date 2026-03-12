@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
 
-// register
+// register new user
 export const register = async (req, res) => {
     try {
         const { fullName, email, password, role, githubUsername } = req.body;
@@ -33,7 +33,7 @@ export const register = async (req, res) => {
     }
 };
 
-// login
+// login existing user
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
