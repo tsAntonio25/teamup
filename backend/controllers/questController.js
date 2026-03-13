@@ -19,9 +19,11 @@ export const createQuest = async (req, res) => {
             techStack,
             difficulty,
             deadline,
-            githubRepoOwner,
-            githubRepoName,
-            commissioner: req.user._id 
+            githubRepo: {
+                owner: githubRepoOwner,
+                name: githubRepoName
+            },
+            commissioner: req.user._id
         });
 
         res.status(201).json(quest);
