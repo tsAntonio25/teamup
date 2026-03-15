@@ -1,4 +1,4 @@
-import { getRepoCommits } from "../services/githubService.js";
+import { getRepoCommits, getUserTotalCommits } from "../services/githubService.js";
 
 // get commits for a specific quest
 export const getQuestCommits = async (req, res) => {
@@ -18,3 +18,22 @@ export const getQuestCommits = async (req, res) => {
         });
     }
 };
+
+// get user contributions
+export const getUserContributions = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        const totalCommits = await getUserTotalCommits(username);
+
+        res.json({
+            user: username,
+            totalCommits
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch GitHub user contributions",
+            error: error.message
+        });
+    }
+}
