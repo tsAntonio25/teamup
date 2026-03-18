@@ -33,6 +33,22 @@ const userSchema = new mongoose.Schema({
     githubUsername: {
         type: String,
     },
+    phoneNum: {
+        type: String,
+    },
+    location: {
+        type: String,
+    },
+    professionalInfo: {
+        primarySkills: {
+            type: [String],
+            default: []
+        },
+        techStack: {
+            type: [String],
+            default: []
+        }
+    },
     currentParty: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Party',

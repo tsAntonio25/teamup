@@ -6,11 +6,17 @@ import { getUserTotalCommits } from "../services/githubService.js";
 // register new user
 export const register = async (req, res) => {
     try {
-        const { fullName, email, password, githubUsername } = req.body;
+        const { fullName, email, password, githubUsername, phoneNum, location, professionalInfo } = req.body;
         const exists = await User.findOne({ email });
 
         if (exists) {
             return res.status(400).json({ message: "User already exists" });
+        }
+
+        if (!fullName || !email || !password) {
+            return res.status(400).json({
+                message: "Please provide required fields"
+            });
         }
 
         const hashedPassword = await hashPassword(password);
@@ -19,6 +25,12 @@ export const register = async (req, res) => {
             email,
             password: hashedPassword,
             githubUsername,
+            phoneNum,
+            location,
+            professionalInfo: {
+                primarySkills: professionalInfo?.primarySkills || [],
+                techStack: professionalInfo?.techStack || []
+            },
             role: "apprentice"
         });
 
