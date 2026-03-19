@@ -1,0 +1,205 @@
+<app-navbar />
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://i.postimg.cc/SXmRwPdk/hero-bg.jpg" alt="" />
+    <div class="hero-bg-overlay"></div>
+  </div>
+  <div class="hero-scanlines"></div>
+
+  <div class="hero-content">
+    <p class="hero-tagline">
+      Join the builders, accept missions, and build legendary projects together
+    </p>
+    <h1 class="hero-title">
+      <span class="title-the">THE QUEST</span>
+      <span class="title-begins">BEGINS</span>
+    </h1>
+    <a routerLink="/register" class="cta-btn">Start Now</a>
+  </div>
+
+  <div class="hero-chars">
+    <img
+      src="https://i.postimg.cc/FfjDhZZP/character-hero.png"
+      alt="TeamUP Characters"
+      class="hero-chars-img"
+    />
+  </div>
+</section>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <span *ngFor="let t of tickerItems">{{ t }}</span>
+    <span *ngFor="let t of tickerItems">{{ t }}</span>
+  </div>
+</div>
+
+<!-- ═══ MISSIONS ═══ -->
+<section class="missions" id="missions">
+  <div class="section-header">
+    <p class="section-eyebrow">CURRENT MISSIONS IN THE REGION</p>
+    <p class="section-desc">
+      Bridging the skills national skills gap by connecting talent with opportunity.
+      Take on missions, grow your career, shape Angeles City's tech future.
+    </p>
+  </div>
+
+  <div class="missions-grid">
+    <div class="mission-card" *ngFor="let m of missions">
+      <div class="mission-img-wrap">
+        <img [src]="m.img" [alt]="m.title" />
+        <span class="mission-badge" [ngClass]="m.difficulty">{{ m.difficulty }}</span>
+      </div>
+      <div class="mission-body">
+        <p class="mission-affiliate">{{ m.affiliate }}</p>
+        <h3 class="mission-title">{{ m.title }}</h3>
+        <p class="mission-desc">{{ m.desc }}</p>
+        <div class="mission-footer">
+          <span class="mission-xp">+{{ m.xp }} XP</span>
+          <a routerLink="/register" class="mission-cta">Accept Quest →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proof of Skill Banner -->
+  <div class="proof-banner">
+    <div class="proof-icon">🏆</div>
+    <div class="proof-text">
+      <strong>PROOF OF SKILL</strong>
+      <p>
+        Complete missions to earn verifiable credentials. Build your portfolio,
+        level up your rank, unlock premium opportunities in the digital economy.
+      </p>
+    </div>
+    <a routerLink="/register" class="proof-cta">Join the Quest</a>
+  </div>
+</section>
+
+<!-- ═══ DON'T QUEST ALONE TICKER ═══ -->
+<div class="ticker-bar ticker-pink">
+  <div class="ticker-track ticker-reverse">
+    <span *ngFor="let t of ticker2">{{ t }}</span>
+    <span *ngFor="let t of ticker2">{{ t }}</span>
+  </div>
+</div>
+
+<!-- ═══ ROLES ═══ -->
+<section class="roles" id="roles">
+  <div class="role-row" *ngFor="let r of roles; let i = index"
+       [class.role-row-reverse]="i % 2 !== 0">
+    <div class="role-visual">
+      <img [src]="r.img" [alt]="r.name" class="role-img" />
+    </div>
+    <div class="role-info">
+      <h2 class="role-name">{{ r.name }}</h2>
+      <div class="role-stars">
+        <span *ngFor="let s of getArr(r.stars)">★</span>
+      </div>
+      <div class="role-stat">
+        <span class="rs-label">RANK:</span>
+        <span class="rs-val">{{ r.rank }}</span>
+      </div>
+      <div class="role-stat">
+        <span class="rs-label">MISSION:</span>
+        <span class="rs-val">{{ r.mission }}</span>
+      </div>
+      <div class="role-stat">
+        <span class="rs-label">QUEST:</span>
+        <span class="rs-val">{{ r.quest }}</span>
+      </div>
+      <div class="role-stat loot">
+        <span class="rs-label">LOOT DROP:</span>
+        <span class="rs-val">{{ r.loot }}</span>
+      </div>
+      <a routerLink="/register" class="role-cta">Play as {{ r.shortName }} →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SYSTEM OVERLAYS ═══ -->
+<section class="overlays-section">
+  <div class="overlay-card">
+    <div class="overlay-header">
+      <span class="overlay-tag">SYSTEM MESSAGE</span>
+      <h3>Architect's Protocol</h3>
+    </div>
+    <p>
+      Congratulations, Adventurer. You've reached a new milestone. Your dedication
+      to the mission has been noticed. The Guild invites you to unlock your next rank
+      and expand your access to the digital economy of Angeles City.
+    </p>
+    <div class="overlay-actions">
+      <button class="ov-btn-ghost">Pass</button>
+      <a routerLink="/register" class="ov-btn-primary">Login</a>
+    </div>
+  </div>
+
+  <div class="overlay-card">
+    <div class="overlay-header">
+      <span class="overlay-tag">SYSTEM MESSAGE</span>
+      <h3>Rank Ascension Overlay</h3>
+    </div>
+    <p>
+      Complete your Quest for your Commissioner to level up and assist your project
+      in achieving its goals. You're qualifying for a higher rank, unlocking new
+      opportunities for your professional portfolio.
+    </p>
+    <div class="overlay-actions">
+      <button class="ov-btn-ghost">Pass</button>
+      <a routerLink="/register" class="ov-btn-primary">Login</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="final-cta" id="about">
+  <div class="final-cta-inner">
+    <div class="final-img-wrap">
+      <img
+        src="https://i.postimg.cc/mzcXRmZ8/Screenshot-2026-03-18-at-1-16-36-PM.png"
+        alt="Ready to join"
+        class="final-img"
+      />
+    </div>
+    <div class="final-text">
+      <h2>READY TO JOIN <span class="accent">THE PARTY?</span></h2>
+      <blockquote>
+        "Conquer the digital economy of Angeles City and Clark by turning professional
+        growth into an epic journey. By joining the party, you aren't just coding —
+        you are actively bridging the 63% national skills gap, transforming the local
+        IT landscape one high-stakes quest at a time."
+      </blockquote>
+      <a routerLink="/register" class="cta-btn cta-lg">Register as Adventurer</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="https://i.postimg.cc/VJ15DJWZ/Team-Up.png" alt="TeamUP" class="footer-logo" />
+      <p>Building Angeles City's digital future, one quest at a time.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <a routerLink="/">Home</a>
+        <a href="#missions">Missions</a>
+        <a href="#roles">Roles</a>
+        <a href="#about">About</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Sign Up</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 TeamUP. All rights reserved. Built for Angeles City 🇵🇭</p>
+  </div>
+</footer>

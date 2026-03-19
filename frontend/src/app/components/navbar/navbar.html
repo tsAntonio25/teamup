@@ -1,0 +1,52 @@
+<nav class="navbar">
+  <div class="nav-brand">
+    <img
+      src="https://i.postimg.cc/VJ15DJWZ/Team-Up.png"
+      alt="TeamUP"
+      class="logo-img"
+    />
+  </div>
+
+  <div class="nav-center">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+    <a href="#missions">Missions</a>
+    <a href="#roles">Roles</a>
+    <a href="#about">About</a>
+  </div>
+
+  <div class="nav-end">
+    @if (isLoggedIn()) {
+      <div class="user-badge">
+        <span class="user-role-tag">{{ roleLabel() }}</span>
+        <span class="user-name">{{ userName() }}</span>
+      </div>
+      <button class="btn-ghost" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/login" class="btn-ghost">Login</a>
+      <a routerLink="/register" class="btn-primary">Sign Up</a>
+    }
+  </div>
+
+  <button
+    class="hamburger"
+    (click)="mobileOpen = !mobileOpen"
+    [class.open]="mobileOpen"
+  >
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-nav" [class.open]="mobileOpen" (click)="mobileOpen = false">
+  <a routerLink="/">Home</a>
+  <a href="#missions">Missions</a>
+  <a href="#roles">Roles</a>
+  <a href="#about">About</a>
+  @if (isLoggedIn()) {
+    <span class="mobile-user">{{ userName() }} · {{ roleLabel() }}</span>
+    <button (click)="logout()">Logout</button>
+  } @else {
+    <a routerLink="/login">Login</a>
+    <a routerLink="/register" class="mobile-cta">Sign Up</a>
+  }
+</div>
