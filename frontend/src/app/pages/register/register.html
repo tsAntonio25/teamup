@@ -1,0 +1,228 @@
+<div class="auth-page">
+  <a routerLink="/" class="back-link">← Back to Home</a>
+
+  <div class="auth-card">
+
+    <!-- ── LEFT: Pixel art illustration ── -->
+    <div class="auth-illustration">
+      <img
+        src="https://i.postimg.cc/QVbfWFh9/hero-regist.png"
+        alt="Register illustration"
+        class="illus-img"
+      />
+      <div class="illus-overlay"></div>
+    </div>
+
+    <!-- ── RIGHT: Form ── -->
+    <div class="auth-form-panel">
+      <div class="form-top">
+        <img
+          src="https://i.postimg.cc/VJ15DJWZ/Team-Up.png"
+          alt="TeamUP"
+          class="form-logo"
+        />
+        <h1>Create Your Account</h1>
+        <p>Join the platform and start collaborating with your team today.</p>
+      </div>
+
+      <div class="divider">— or sign up with Email —</div>
+
+      <!-- Step tabs -->
+      <div class="step-tabs">
+        <div class="step-tab" [class.active]="step() === 1" (click)="step.set(1)">
+          <span class="st-dot">1</span> Basic Info
+        </div>
+        <span class="st-sep">————</span>
+        <div class="step-tab"
+             [class.active]="step() === 2"
+             [class.unlocked]="step1Valid()"
+             (click)="step1Valid() && step.set(2)">
+          <span class="st-dot">2</span> Profile
+        </div>
+      </div>
+
+      @if (apiError()) {
+        <div class="error-banner">⚠️ {{ apiError() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="auth-form">
+
+        <!-- ══ STEP 1 ══ -->
+        @if (step() === 1) {
+          <div class="step-fields">
+
+            <div class="field" [class.field-error]="isInvalid('fullName')">
+              <label>Full Name</label>
+              <input type="text" formControlName="fullName"
+                     placeholder="Juan dela Cruz" autocomplete="name" />
+              @if (isInvalid('fullName')) {
+                <span class="field-hint">Full name is required.</span>
+              }
+            </div>
+
+            <div class="field" [class.field-error]="isInvalid('email')">
+              <label>Email</label>
+              <input type="email" formControlName="email"
+                     placeholder="mail@example.com" autocomplete="email" />
+              @if (isInvalid('email')) {
+                <span class="field-hint">{{ getError('email') }}</span>
+              }
+            </div>
+
+            <div class="field" [class.field-error]="isInvalid('password')">
+              <label>Password</label>
+              <div class="input-wrap">
+                <input [type]="showPass() ? 'text' : 'password'"
+                       formControlName="password"
+                       placeholder="Min. 8 characters"
+                       autocomplete="new-password" />
+                <button type="button" class="eye-btn" (click)="showPass.set(!showPass())">
+                  {{ showPass() ? '🙈' : '👁️' }}
+                </button>
+              </div>
+              @if (form.get('password')?.value) {
+                <div class="strength-row">
+                  <div class="strength-bar">
+                    <div
+                      class="strength-fill"
+                      [class.weak]="strengthClass() === 'weak'"
+                      [class.fair]="strengthClass() === 'fair'"
+                      [class.strong]="strengthClass() === 'strong'"
+                      [style.width.%]="strengthPct()"
+                    ></div>
+                  </div>
+                  <span
+                    class="strength-txt"
+                    [class.weak]="strengthClass() === 'weak'"
+                    [class.fair]="strengthClass() === 'fair'"
+                    [class.strong]="strengthClass() === 'strong'"
+                  >{{ strengthLabel() }}</span>
+                </div>
+              }
+              @if (isInvalid('password')) {
+                <span class="field-hint">{{ getError('password') }}</span>
+              }
+            </div>
+
+            <div class="field"
+                 [class.field-error]="form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched">
+              <label>Confirm Password</label>
+              <div class="input-wrap">
+                <input [type]="showConfirm() ? 'text' : 'password'"
+                       formControlName="confirmPassword"
+                       placeholder="Repeat your password"
+                       autocomplete="new-password" />
+                <button type="button" class="eye-btn" (click)="showConfirm.set(!showConfirm())">
+                  {{ showConfirm() ? '🙈' : '👁️' }}
+                </button>
+              </div>
+              @if (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched) {
+                <span class="field-hint">Passwords do not match.</span>
+              }
+            </div>
+
+            <button type="button" class="submit-btn"
+                    (click)="nextStep()" [disabled]="!step1Valid()">
+              Next: Profile Info →
+            </button>
+
+          </div>
+        }
+
+        <!-- ══ STEP 2 ══ -->
+        @if (step() === 2) {
+          <div class="step-fields">
+
+            <div class="field">
+              <label>
+                GitHub Username
+                <span class="lbl-note">Auto-calculates your role</span>
+              </label>
+              <input type="text" formControlName="githubUsername"
+                     placeholder="your-github-username" autocomplete="off" />
+              <span class="field-note">3000+ commits → auto-promoted to Party Master on login</span>
+            </div>
+
+            <div class="field">
+              <label>Phone Number <span class="lbl-note">Optional</span></label>
+              <input type="text" formControlName="phoneNum"
+                     placeholder="+63 9XX XXX XXXX" autocomplete="tel" />
+            </div>
+
+            <div class="field">
+              <label>Location <span class="lbl-note">Optional</span></label>
+              <input type="text" formControlName="location"
+                     placeholder="Angeles City, Pampanga" autocomplete="address-level2" />
+            </div>
+
+            <div class="field">
+              <label>
+                Primary Skills
+                <span class="lbl-note">Press Enter or comma to add</span>
+              </label>
+              <div class="tag-box">
+                @for (s of primarySkills(); track s) {
+                  <span class="tag">
+                    {{ s }}
+                    <button type="button" (click)="removeSkill(s)">×</button>
+                  </span>
+                }
+                <input type="text" class="tag-input"
+                       placeholder="e.g. Angular..."
+                       (keydown)="onSkillKey($event)" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>
+                Tech Stack
+                <span class="lbl-note">Press Enter or comma to add</span>
+              </label>
+              <div class="tag-box">
+                @for (t of techStack(); track t) {
+                  <span class="tag">
+                    {{ t }}
+                    <button type="button" (click)="removeTech(t)">×</button>
+                  </span>
+                }
+                <input type="text" class="tag-input"
+                       placeholder="e.g. Node.js..."
+                       (keydown)="onTechKey($event)" />
+              </div>
+            </div>
+
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="agreeTerms" />
+              <span>
+                I agree to the <a href="#" class="link">Terms of Service</a>
+                and <a href="#" class="link">Privacy Policy</a>
+              </span>
+            </label>
+            @if (termsError()) {
+              <span class="field-hint">You must agree to continue.</span>
+            }
+
+            <div class="step2-btns">
+              <button type="button" class="back-btn" (click)="step.set(1)">← Back</button>
+              <button type="submit" class="submit-btn flex1" [disabled]="isLoading()">
+                @if (isLoading()) {
+                  <span class="spinner"></span> Creating Account...
+                } @else {
+                  Sign Up
+                }
+              </button>
+            </div>
+
+          </div>
+        }
+
+      </form>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a routerLink="/login" class="switch-link">Login</a>
+      </p>
+    </div>
+
+  </div>
+</div>
