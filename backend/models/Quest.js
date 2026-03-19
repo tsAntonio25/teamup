@@ -21,11 +21,6 @@ const questSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
-    difficulty: {
-        type: String,
-        enum: ['easy', 'medium', 'hard'],
-        default: 'medium',
-    },
     deadline: {
         type: Date,
     },

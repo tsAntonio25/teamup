@@ -7,7 +7,6 @@ export const createQuest = async (req, res) => {
             title,
             description,
             techStack,
-            difficulty,
             deadline,
             githubRepoOwner,
             githubRepoName
@@ -17,7 +16,6 @@ export const createQuest = async (req, res) => {
             title,
             description,
             techStack,
-            difficulty,
             deadline,
             githubRepo: {
                 owner: githubRepoOwner,
