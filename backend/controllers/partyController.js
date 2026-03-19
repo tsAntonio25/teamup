@@ -1,5 +1,4 @@
 import Party from "../models/Party.js";
-import User from "../models/User.js"
 import Quest from "../models/Quest.js";
 
 // create party (POST)
@@ -12,6 +11,11 @@ export const createParty = async (req, res) => {
             return res.status(400).json({
                 message: "You are already in a party"
             })
+        }
+
+        // check if user is partyMaster
+        if (req.user.role !== "partyMaster") {
+            return res.status(403).json({ message: "Only Party Masters can create parties" });
         }
 
         const party = await Party.create({
@@ -78,10 +82,16 @@ export const joinParty = async (req, res) => {
         }
 
         party.apprentices.push(req.user._id);
-        await party.save();
 
         req.user.currentParty = party._id;
         await req.user.save();
+
+        updatePartyStatus(party);
+
+        console.log("Before save status:", party.status);
+        console.log("Apprentices count:", party.apprentices.length);
+
+        await party.save();
 
         // list party members
         const populatedParty = await Party.findById(party._id)
@@ -121,10 +131,20 @@ export const leaveParty = async (req, res) => {
             return res.status(400).json({ message: "You cannot leave the party while quest is ongoing" });
         }
 
+        // if not a part of the party
+        if (!party.apprentices.some(id => id.toString() === req.user._id.toString())) {
+            return res.status(400).json({
+                message: "You are not a member of this party"
+            });
+        }
+
         // remove apprentice id to list
         party.apprentices = party.apprentices.filter(
             (id) => id.toString() !== req.user._id.toString()
         );
+
+        updatePartyStatus(party);
+
         await party.save();
 
         req.user.currentParty = null;
@@ -208,6 +228,20 @@ export const acceptQuest = async (req, res) => {
             });
         }
 
+        // if apprentices is less than 2
+        if (party.apprentices.length < 2) {
+            return res.status(400).json({
+                message: "Party must have 2 apprentices before accepting a quest"
+            });
+        }
+
+        // if party not ready for quest
+        if (party.status !== "ready_for_quest") {
+            return res.status(400).json({
+                message: "Party is not ready for a quest"
+            });
+        }
+
         // party already on quest
         if (party.status === "on_quest") {
             return res.status(400).json({
@@ -228,6 +262,7 @@ export const acceptQuest = async (req, res) => {
         await party.save();
 
         // update quest
+        quest.party = party._id;
         quest.status = "in_progress";
         await quest.save();
 
@@ -245,5 +280,11 @@ export const acceptQuest = async (req, res) => {
     }
 }
 
-// complete quest (POST)
-// wait lang dito need pa ng computation exp from gh commits
+// helper func
+function updatePartyStatus(party) {
+    if (party.apprentices.length >= 2) {
+        party.status = "ready_for_quest";
+    } else {
+        party.status = "forming";
+    }
+}

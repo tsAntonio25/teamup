@@ -13,7 +13,7 @@ import { restrictTo } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// party masters
+// party masters restricted
 router.post("/", protect, restrictTo("partyMaster"), createParty);
 router.post("/:partyId/accept-quest/:questId", protect, restrictTo("partyMaster"), acceptQuest);
 

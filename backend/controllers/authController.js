@@ -6,38 +6,46 @@ import { getUserTotalCommits } from "../services/githubService.js";
 // register new user
 export const register = async (req, res) => {
     try {
-        const { fullName, email, password, githubUsername, phoneNum, location, professionalInfo } = req.body;
+        const { fullName, email, password, role, githubUsername, phoneNum, location, professionalInfo } = req.body;
         const exists = await User.findOne({ email });
 
+        // if user already exists
         if (exists) {
             return res.status(400).json({ message: "User already exists" });
         }
 
+        // if incomplete required fields
         if (!fullName || !email || !password) {
             return res.status(400).json({
                 message: "Please provide required fields"
             });
         }
 
+        if (role && !["apprentice", "commissioner"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role" });
+        }
+
         const hashedPassword = await hashPassword(password);
+
         const user = await User.create({
             fullName,
             email,
             password: hashedPassword,
+            role: role || "apprentice",
             githubUsername,
             phoneNum,
             location,
             professionalInfo: {
                 primarySkills: professionalInfo?.primarySkills || [],
                 techStack: professionalInfo?.techStack || []
-            },
-            role: "apprentice"
+            }
         });
 
         res.json({
             user,
             token: generateToken(user._id)
         });
+
     } catch (error) {
         res.status(500).json({
             message: "Registration failed",

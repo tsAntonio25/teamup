@@ -1,14 +1,27 @@
 import express from "express";
-import { createQuest, listQuests, getQuestById, updateQuest } from "../controllers/questController.js";
+import {
+    createQuest,
+    listQuests,
+    listQuestsByParty,
+    getQuestById,
+    updateQuest,
+    completeQuest
+} from "../controllers/questController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
+import { restrictTo } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// quest routes
-router.post("/", protect, createQuest);
+// commissioner restricted route
+router.post("/", protect, restrictTo("commissioner"), createQuest);
+router.put("/:id", protect, restrictTo("commissioner"),  updateQuest);
+router.post("/:id/complete", protect, restrictTo("commissioner"), completeQuest);
+
+// public
 router.get("/", listQuests);
+router.get("/party/:id", listQuestsByParty);
 router.get("/:id", getQuestById);
-router.put("/:id", protect, updateQuest);
+
 
 export default router;

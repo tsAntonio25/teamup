@@ -9,6 +9,7 @@ import githubRoutes from "./routes/githubRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import questRoutes from "./routes/questRoutes.js";
 import partyRoutes from "./routes/partyRoutes.js"
+import taskRoutes from "./routes/taskRoutes.js"
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/quests", questRoutes);
 app.use("/api/parties", partyRoutes);
-
+app.use("/api/tasks", taskRoutes);
 
 // start server
 app.listen(process.env.PORT, () => {

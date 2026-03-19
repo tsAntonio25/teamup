@@ -38,6 +38,11 @@ const questSchema = new mongoose.Schema({
             type: String,
             required: true
         }
+    },
+    party : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Party',
+        default: null
     }
 },
     { timestamps: true }
