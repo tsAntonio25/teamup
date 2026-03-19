@@ -42,10 +42,67 @@ const userSchema = new mongoose.Schema({
     professionalInfo: {
         primarySkills: {
             type: [String],
+            enum: [
+                'Web Development',
+                'Mobile Development',
+                'UI/UX Design',
+                'Backend Development',
+                'Frontend Development',
+                'Full Stack Development',
+                'Game Development',
+                'Data Science',
+                'Machine Learning',
+                'DevOps',
+                'Cybersecurity',
+                'Cloud Computing',
+                'QA / Testing',
+                'Technical Writing'
+            ],
             default: []
         },
         techStack: {
             type: [String],
+            enum: [
+                // Frontend
+                'HTML',
+                'CSS',
+                'JavaScript',
+                'TypeScript',
+                'Angular',
+                'React',
+                'Vue',
+                'Next.js',
+
+                // Backend
+                'Node.js',
+                'Express.js',
+                'Django',
+                'Flask',
+                'Laravel',
+
+                // Databases
+                'MongoDB',
+                'MySQL',
+                'PostgreSQL',
+                'Firebase',
+
+                // DevOps / Tools
+                'Docker',
+                'Kubernetes',
+                'Git',
+                'GitHub Actions',
+
+                // Cloud
+                'AWS',
+                'Azure',
+                'Google Cloud',
+
+                // Mobile
+                'Flutter',
+                'React Native',
+                'Swift',
+                'Kotlin'
+            ],
             default: []
         }
     },
