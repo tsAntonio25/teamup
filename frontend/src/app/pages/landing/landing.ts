@@ -1,51 +1,114 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { NgFor, NgClass } from '@angular/common';
-import { Navbar } from '../../components/navbar/navbar';
+import { Component, inject } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
+import { NgFor, NgClass, UpperCasePipe } from '@angular/common';
+import { LandingNav } from '../../components/landing-nav/landing-nav';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, NgFor, NgClass, Navbar],
+  imports: [RouterLink, NgFor, NgClass, LandingNav, UpperCasePipe],
   templateUrl: './landing.html',
   styleUrl: './landing.css'
 })
 export class Landing {
-  tickerItems = [
-    '⚡ QUEST ACTIVE', '🏆 PROOF OF SKILL', '🌐 ANGELES CITY',
-    '💻 BUILD THE FUTURE', '🎯 LEVEL UP', '🚀 JOIN THE PARTY',
-    '⚔️ TEAMUP NOW', '🔥 63% SKILLS GAP', '🇵🇭 CLARK FREEPORT',
-  ];
+  private readonly router = inject(Router);
 
-  ticker2 = [
-    "⚔️ DON'T QUEST ALONE", "⚔️ DON'T QUEST ALONE",
-    "⚔️ DON'T QUEST ALONE", "⚔️ DON'T QUEST ALONE",
-    "⚔️ DON'T QUEST ALONE", "⚔️ DON'T QUEST ALONE",
-  ];
+  activeIndex = 0;
+
+  goToRegister(): void { this.router.navigate(['/register']); }
+
+  nextMission(): void {
+    if (this.activeIndex < this.missions.length - 1) this.activeIndex++;
+  }
+
+  prevMission(): void {
+    if (this.activeIndex > 0) this.activeIndex--;
+  }
+
+  setActive(i: number): void { this.activeIndex = i; }
+
+  getXpPercent(xp: number, total: number): number {
+    return Math.min(Math.round((xp / total) * 100), 100);
+  }
+tickerItems = [
+  'QUEST ACTIVE', 'PROOF OF SKILL', 'ANGELES CITY',
+  'BUILD THE FUTURE', 'LEVEL UP', 'JOIN THE PARTY',
+  'TEAMUP NOW', '63% SKILLS GAP', 'CLARK FREEPORT',
+];
+
+ticker2 = [
+  "DON'T QUEST ALONE",
+  "DON'T QUEST ALONE",
+  "DON'T QUEST ALONE",
+  "DON'T QUEST ALONE",
+  "DON'T QUEST ALONE",
+  "DON'T QUEST ALONE",
+];
 
   missions = [
     {
       img: 'https://i.postimg.cc/MfHkT5nJ/Cozy-Pixel-Art-Cafe-Scene-Autumn-Coffee-Shop-Aesthetic-with-Pastries-Warm-Lighting.jpg',
-      affiliate: 'LOCAL BUSINESS',
+      tag: 'LOCAL BUSINESS',
+      type: 'Web App',
       title: 'DIGITAL MENU FOR LOCAL CAFE',
-      desc: 'Build a modern digital ordering system for a beloved local eatery in Clark.',
+      desc: 'Build a modern digital ordering system for a beloved local eatery in Clark Freeport Zone.',
       difficulty: 'easy',
-      xp: 250
+      techStack: ['Angular', 'Node.js', 'MongoDB'],
+      xp: 250,
+      xpToRankUp: 500,
+      currentRank: 'Apprentice',
+      nextRank: 'Journeyman'
     },
     {
       img: 'https://i.postimg.cc/m1tqRrnN/Amy-s-Fantasies-PC-98.jpg',
-      affiliate: 'REAL ESTATE',
+      tag: 'REAL ESTATE',
+      type: 'Full Stack',
       title: 'DIGITAL INNOVATION HUB',
-      desc: 'Design a property listing platform for the Clark Freeport Zone.',
+      desc: 'Design and develop a property listing platform for the Clark Freeport Zone ecosystem.',
       difficulty: 'medium',
-      xp: 500
+      techStack: ['React', 'Express', 'PostgreSQL'],
+      xp: 500,
+      xpToRankUp: 1000,
+      currentRank: 'Journeyman',
+      nextRank: 'Expert'
     },
     {
       img: 'https://i.postimg.cc/DWnM06NR/(22).jpg',
-      affiliate: 'E-COMMERCE',
+      tag: 'E-COMMERCE',
+      type: 'Platform',
       title: 'E-COMMERCE PLATFORM LAUNCH',
       desc: 'Launch a full-stack marketplace connecting local artisans with global buyers.',
       difficulty: 'hard',
-      xp: 1000
+      techStack: ['Angular', 'Express', 'AWS', 'Redis'],
+      xp: 1000,
+      xpToRankUp: 2000,
+      currentRank: 'Expert',
+      nextRank: 'Party Master'
+    },
+    {
+      img: 'https://i.postimg.cc/bYGW0k5b/PARTY-MASTER.png',
+      tag: 'FINTECH',
+      type: 'Mobile + Web',
+      title: 'PAYMENT GATEWAY INTEGRATION',
+      desc: 'Integrate a secure payment system for local SMEs across Angeles City and Clark.',
+      difficulty: 'hard',
+      techStack: ['Vue.js', 'Node.js', 'Stripe', 'Docker'],
+      xp: 1200,
+      xpToRankUp: 2000,
+      currentRank: 'Expert',
+      nextRank: 'Party Master'
+    },
+    {
+      img: 'https://i.postimg.cc/m1tqRrnN/Amy-s-Fantasies-PC-98.jpg',
+      tag: 'EDUCATION',
+      type: 'LMS Platform',
+      title: 'SKILLS TRAINING PORTAL',
+      desc: 'Build a learning management system for local tech bootcamps and training centers.',
+      difficulty: 'medium',
+      techStack: ['Angular', 'NestJS', 'MySQL'],
+      xp: 600,
+      xpToRankUp: 1000,
+      currentRank: 'Journeyman',
+      nextRank: 'Expert'
     },
   ];
 
@@ -82,7 +145,5 @@ export class Landing {
     },
   ];
 
-  getArr(n: number): number[] {
-    return Array(n).fill(0);
-  }
+  getArr(n: number): number[] { return Array(n).fill(0); }
 }

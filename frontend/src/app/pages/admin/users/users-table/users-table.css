@@ -1,0 +1,160 @@
+.table-wrapper {
+  overflow: hidden;
+  box-shadow:
+    -4px 0 12px rgba(255, 115, 199, 0.6),
+    0 4px 12px rgba(255, 115, 199, 0.6);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Header */
+.table-header-row {
+  background: #E64E9B;
+}
+
+.table-header-row th {
+  padding: 0.85rem 1.2rem;
+  font-size: 0.80rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: white;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Rows */
+.table-row {
+  background: #FFD4EE;
+  border-bottom: 1.5px solid #FF73C7;
+  transition: background 0.15s ease;
+}
+
+.table-row.alt {
+  background: #FFD4EE;
+}
+
+.table-row:hover {
+  background: #FFCFEB;
+}
+
+.table-row td {
+  padding: 0.75rem 1.2rem;
+  font-size: 0.8rem;
+  color: #210251;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Name cell */
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-weight: 600;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #A60050;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Email */
+.email-cell {
+  font-style: italic;
+  color: #680937 !important;
+  font-weight: 500;
+}
+
+/* Level */
+.level-cell {
+  font-weight: 700;
+  color: #680937 !important;
+}
+
+/* Role badges */
+.role-badge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.role-freelancer {
+  background: #47079C;
+  color: #fff;
+  font-weight: 400;
+}
+
+.role-client {
+  background: #E54E97;
+  color: #fff;
+  font-weight: 400; }
+
+/* Rank badges */
+.rank-badge {
+  display: inline-block;
+  padding: 0.3rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.rank-bronze {
+  background: #CD5C5C;
+  color: white;
+  font-weight: 400;
+}
+
+.rank-silver {
+  background: #C7A4FF;
+  color: #210251;
+  font-weight: 400;
+}
+
+.rank-gold {
+  background: #FFD700;
+  color: #594B04;
+  font-weight: 400;
+}
+
+.rank-platinum {
+  background: #FF73C7;
+  color: #680937;
+  font-weight: 400;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-active {
+  background: #008000;
+  color: white;
+  font-weight: 400;
+}
+
+.status-suspended {
+  background: #680937;
+  color: white;
+  font-weight: 400;
+}

@@ -1,0 +1,87 @@
+.table-wrapper {
+  overflow: hidden;
+  box-shadow:
+    -4px 0 12px rgba(255, 115, 199, 0.6),
+    0 4px 12px rgba(255, 115, 199, 0.6);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Header */
+.table-header-row {
+  background: #E64E9B;
+}
+
+.table-header-row th {
+  padding: 0.85rem 1.2rem;
+  font-size: 0.80rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: white;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Rows */
+.table-row {
+  background: #FFD4EE;
+  border-bottom: 1.5px solid #FF73C7;
+  transition: background 0.15s ease;
+}
+
+.table-row.alt {
+  background: #FFD4EE;
+}
+
+.table-row:hover {
+  background: #FFCFEB;
+}
+
+.table-row td {
+  padding: 0.75rem 1.2rem;
+  font-size: 0.8rem;
+  color: #680937;
+  vertical-align: middle;
+  text-align: center;
+  font-weight: 550;
+}
+
+/* Quest name */
+.quest-name-cell {
+  font-weight: 600;
+  color: #210251;
+  text-align: center;
+}
+
+/* Posted */
+.posted-cell {
+  font-style: normal;
+  font-weight: 600;
+  color: #680937 !important;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #fff;
+}
+
+.status-pending {
+  background: #B00357;
+}
+
+.status-in-progress {
+  background: #7F47D5;
+}
+
+.status-completed {
+  background: #008000;
+}

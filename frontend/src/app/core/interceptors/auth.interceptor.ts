@@ -4,9 +4,6 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
-// Attaches Bearer token to every request
-// Matches backend authMiddleware.js:
-// req.headers.authorization?.startsWith("Bearer")
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router      = inject(Router);
@@ -19,7 +16,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Token expired or invalid — auto logout
       if (error.status === 401) {
         authService.logout();
         router.navigate(['/login']);

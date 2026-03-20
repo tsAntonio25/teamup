@@ -6,7 +6,7 @@
     <!-- ── LEFT: Pixel art illustration ── -->
     <div class="auth-illustration">
       <img
-        src="https://i.postimg.cc/QVbfWFh9/hero-regist.png"
+        src="https://i.postimg.cc/SN0339Pr/hero_regist.png"
         alt="Register illustration"
         class="illus-img"
       />
@@ -25,14 +25,14 @@
         <p>Join the platform and start collaborating with your team today.</p>
       </div>
 
-      <div class="divider">— or sign up with Email —</div>
+      <div class="divider">or sign up with Email</div>
 
       <!-- Step tabs -->
       <div class="step-tabs">
         <div class="step-tab" [class.active]="step() === 1" (click)="step.set(1)">
           <span class="st-dot">1</span> Basic Info
         </div>
-        <span class="st-sep">————</span>
+        <div class="st-sep"></div>
         <div class="step-tab"
              [class.active]="step() === 2"
              [class.unlocked]="step1Valid()"
@@ -74,33 +74,37 @@
               <div class="input-wrap">
                 <input [type]="showPass() ? 'text' : 'password'"
                        formControlName="password"
-                       placeholder="Min. 8 characters"
+                       placeholder="Create a strong password"
                        autocomplete="new-password" />
                 <button type="button" class="eye-btn" (click)="showPass.set(!showPass())">
                   {{ showPass() ? '🙈' : '👁️' }}
                 </button>
               </div>
-              @if (form.get('password')?.value) {
-                <div class="strength-row">
-                  <div class="strength-bar">
-                    <div
-                      class="strength-fill"
-                      [class.weak]="strengthClass() === 'weak'"
-                      [class.fair]="strengthClass() === 'fair'"
-                      [class.strong]="strengthClass() === 'strong'"
-                      [style.width.%]="strengthPct()"
-                    ></div>
+
+              <!-- Password requirements checklist -->
+              @if (form.get('password')?.dirty || form.get('password')?.touched) {
+                <div class="pw-requirements">
+                  <div class="pw-req" [class.met]="pwReqs().minLength">
+                    <span class="pw-req-icon">{{ pwReqs().minLength ? '✓' : '○' }}</span>
+                    At least 8 characters
                   </div>
-                  <span
-                    class="strength-txt"
-                    [class.weak]="strengthClass() === 'weak'"
-                    [class.fair]="strengthClass() === 'fair'"
-                    [class.strong]="strengthClass() === 'strong'"
-                  >{{ strengthLabel() }}</span>
+                  <div class="pw-req" [class.met]="pwReqs().hasUpper">
+                    <span class="pw-req-icon">{{ pwReqs().hasUpper ? '✓' : '○' }}</span>
+                    One uppercase letter (A–Z)
+                  </div>
+                  <div class="pw-req" [class.met]="pwReqs().hasLower">
+                    <span class="pw-req-icon">{{ pwReqs().hasLower ? '✓' : '○' }}</span>
+                    One lowercase letter (a–z)
+                  </div>
+                  <div class="pw-req" [class.met]="pwReqs().hasNumber">
+                    <span class="pw-req-icon">{{ pwReqs().hasNumber ? '✓' : '○' }}</span>
+                    One number (0–9)
+                  </div>
+                  <div class="pw-req" [class.met]="pwReqs().hasSpecial">
+                    <span class="pw-req-icon">{{ pwReqs().hasSpecial ? '✓' : '○' }}</span>
+                    One special character (!&#64;#$%...)
+                  </div>
                 </div>
-              }
-              @if (isInvalid('password')) {
-                <span class="field-hint">{{ getError('password') }}</span>
               }
             </div>
 
@@ -133,64 +137,124 @@
         @if (step() === 2) {
           <div class="step-fields">
 
+            <!-- GitHub -->
             <div class="field">
               <label>
                 GitHub Username
                 <span class="lbl-note">Auto-calculates your role</span>
               </label>
-              <input type="text" formControlName="githubUsername"
-                     placeholder="your-github-username" autocomplete="off" />
+              <div class="input-wrap input-icon-left">
+                <span class="input-icon">⌥</span>
+                <input type="text" formControlName="githubUsername"
+                       placeholder="your-github-username" autocomplete="off" />
+              </div>
               <span class="field-note">3000+ commits → auto-promoted to Party Master on login</span>
             </div>
 
+            <!-- Phone -->
             <div class="field">
               <label>Phone Number <span class="lbl-note">Optional</span></label>
               <input type="text" formControlName="phoneNum"
                      placeholder="+63 9XX XXX XXXX" autocomplete="tel" />
             </div>
 
+            <!-- Location -->
             <div class="field">
               <label>Location <span class="lbl-note">Optional</span></label>
               <input type="text" formControlName="location"
                      placeholder="Angeles City, Pampanga" autocomplete="address-level2" />
             </div>
 
+            <!-- Primary Skills — enum multi-select via tags -->
             <div class="field">
               <label>
                 Primary Skills
-                <span class="lbl-note">Press Enter or comma to add</span>
+                <span class="lbl-note">Select from list</span>
               </label>
-              <div class="tag-box">
+              <div class="tag-box" [class.tag-box--focus]="skillDropOpen()">
                 @for (s of primarySkills(); track s) {
                   <span class="tag">
                     {{ s }}
                     <button type="button" (click)="removeSkill(s)">×</button>
                   </span>
                 }
-                <input type="text" class="tag-input"
-                       placeholder="e.g. Angular..."
-                       (keydown)="onSkillKey($event)" />
+                <div class="tag-select-wrap">
+                  <input
+                    type="text"
+                    class="tag-input"
+                    placeholder="{{ primarySkills().length === 0 ? 'Add a skill…' : '' }}"
+                    [value]="skillSearch()"
+                    (input)="skillSearch.set($any($event.target).value)"
+                    (focus)="skillDropOpen.set(true)"
+                    (blur)="onSkillBlur()"
+                    readonly
+                    (click)="skillDropOpen.set(!skillDropOpen())"
+                  />
+                  @if (skillDropOpen()) {
+                    <div class="tag-dropdown">
+                      @for (opt of filteredSkills(); track opt) {
+                        <div
+                          class="tag-opt"
+                          [class.selected]="primarySkills().includes(opt)"
+                          (mousedown)="toggleSkill(opt)"
+                        >
+                          <span class="tag-opt-check">{{ primarySkills().includes(opt) ? '✓' : '' }}</span>
+                          {{ opt }}
+                        </div>
+                      }
+                      @if (filteredSkills().length === 0) {
+                        <div class="tag-opt-empty">No options</div>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
             </div>
 
+            <!-- Tech Stack — enum multi-select via tags -->
             <div class="field">
               <label>
                 Tech Stack
-                <span class="lbl-note">Press Enter or comma to add</span>
+                <span class="lbl-note">Select from list</span>
               </label>
-              <div class="tag-box">
+              <div class="tag-box" [class.tag-box--focus]="techDropOpen()">
                 @for (t of techStack(); track t) {
                   <span class="tag">
                     {{ t }}
                     <button type="button" (click)="removeTech(t)">×</button>
                   </span>
                 }
-                <input type="text" class="tag-input"
-                       placeholder="e.g. Node.js..."
-                       (keydown)="onTechKey($event)" />
+                <div class="tag-select-wrap">
+                  <input
+                    type="text"
+                    class="tag-input"
+                    placeholder="{{ techStack().length === 0 ? 'Add a technology…' : '' }}"
+                    readonly
+                    (click)="techDropOpen.set(!techDropOpen())"
+                    (blur)="onTechBlur()"
+                  />
+                  @if (techDropOpen()) {
+                    <div class="tag-dropdown">
+                      @for (group of techGroups; track group.label) {
+                        <div class="tag-group-label">{{ group.label }}</div>
+                        @for (opt of group.items; track opt) {
+                          <div
+                            class="tag-opt"
+                            [class.selected]="techStack().includes(opt)"
+                            (mousedown)="toggleTech(opt)"
+                          >
+                            <span class="tag-opt-check">{{ techStack().includes(opt) ? '✓' : '' }}</span>
+                            {{ opt }}
+                          </div>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
               </div>
             </div>
 
+            <!-- Terms -->
             <label class="checkbox-label">
               <input type="checkbox" formControlName="agreeTerms" />
               <span>

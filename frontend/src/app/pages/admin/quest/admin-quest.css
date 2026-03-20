@@ -1,0 +1,69 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-wrap {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  padding: 24px;
+  padding-bottom: 100px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stat-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px;
+}
+
+.quest-stat-card {
+  background: #120056;
+  border: 2px solid #C7A4FF;
+  border-radius: 8px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: white;
+  font-family: 'Orbitron', monospace;
+}
+
+.qsc-icon {
+  font-size: 1.4rem;
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qsc-label {
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.qsc-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+}

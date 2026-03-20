@@ -1,0 +1,34 @@
+<div class="shell">
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <div class="main-wrap">
+    <app-admin-header></app-admin-header>
+
+    <div class="content">
+
+      <!-- Stat Cards -->
+      <div class="stat-grid">
+        <div class="stat-item" *ngFor="let stat of stats">
+          <span class="stat-top-label">{{ stat.label }}</span>
+          <div class="quest-stat-card">
+            <div class="qsc-icon">{{ stat.icon }}</div>
+            <span class="qsc-value">{{ stat.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Users Filter -->
+      <app-users-filter
+        (searchChange)="onSearchChange($event)"
+        (roleChange)="onRoleChange($event)"
+        (filterClick)="applyFilter()">
+      </app-users-filter>
+
+      <!-- Users Table -->
+      <app-users-table [users]="filteredUsers"></app-users-table>
+
+    </div>
+
+    <app-footer></app-footer>
+  </div>
+</div>

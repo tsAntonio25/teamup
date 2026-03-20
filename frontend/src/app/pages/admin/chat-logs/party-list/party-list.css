@@ -1,0 +1,148 @@
+.party-list-wrapper {
+  background: rgba(30, 0, 80, 0.85);
+  border-right: 1px solid rgba(199, 164, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Search */
+.search-box {
+  position: relative;
+  padding: 16px;
+  background: #210251;
+  border-bottom: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: rgba(255,255,255,0.4);
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  background: rgba(123, 103, 154, 0.5);
+  border: none;
+  border-radius: 0;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.search-input::placeholder { color: rgba(255,255,255,0.35); }
+
+/* Party items */
+.party-items {
+  flex: 1;
+  overflow-y: auto;
+  background: #210251;
+}
+
+.party-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(199, 164, 255, 0.1);
+  transition: background 0.15s ease;
+  background: #210251;
+}
+
+.party-item.active {
+  background: rgba(238, 228, 255, 0.5);
+}
+
+.party-item:hover {
+  opacity: 0.9;
+}
+
+.party-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(199, 164, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.party-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.party-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Active item */
+.party-item.active .party-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #210251;
+  margin-bottom: 2px;
+}
+
+.party-item.active .party-last-msg {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  font-style: italic;
+  color: #210251;
+}
+
+.party-item.active .party-time {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 300;
+  color: #210251;
+}
+
+/* Inactive items */
+.party-item:not(.active) .party-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.party-item:not(.active) .party-last-msg {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+}
+
+.party-item:not(.active) .party-time {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 300;
+  color: #fff;
+}
+
+.party-msg-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
