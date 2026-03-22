@@ -1,3 +1,4 @@
+import { AdminBackground } from '../admin-background';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
@@ -16,8 +17,7 @@ export interface Quest {
 
 @Component({
   selector: 'app-admin-quest',
-  standalone: true,
-  imports: [CommonModule, AdminSidebar, AdminHeader, Footer, QuestFilter, QuestTable],
+  imports: [AdminBackground, CommonModule, AdminSidebar, AdminHeader, Footer, QuestFilter, QuestTable],
   templateUrl: './admin-quest.html',
   styleUrl: './admin-quest.css'
 })

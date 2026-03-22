@@ -4,7 +4,6 @@ import { Party } from '../admin-chat-logs';
 
 @Component({
   selector: 'app-chat-window',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './chat-window.html',
   styleUrl: './chat-window.css'

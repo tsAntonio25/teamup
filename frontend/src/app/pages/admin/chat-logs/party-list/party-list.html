@@ -12,7 +12,8 @@
 
   <!-- Party Items -->
   <div class="party-items">
-    <div class="party-item" *ngFor="let party of filteredParties"
+    @for (party of filteredParties; track party.id) {
+    <div class="party-item"
       [class.active]="party.id === selectedPartyId"
       (click)="selectParty(party)">
       <div class="party-avatar">{{ party.avatar }}</div>
@@ -24,5 +25,6 @@
         </div>
       </div>
     </div>
+    }
   </div>
 </div>

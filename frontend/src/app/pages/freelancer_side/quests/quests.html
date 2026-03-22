@@ -1,0 +1,98 @@
+<div class="page-wrapper">
+
+  <app-navbar />
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Page Title -->
+    <h1 class="page-title">Quests</h1>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search quests..."
+          [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+      </div>
+      <div class="filter-dropdowns">
+        <select class="filter-select" [(ngModel)]="selectedSkill" (change)="applyFilter()">
+          <option value="">Skills ▾</option>
+          <option>Figma</option>
+          <option>Angular</option>
+          <option>HTML</option>
+          <option>CSS</option>
+          <option>JavaScript</option>
+          <option>Flutter</option>
+          <option>WordPress</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="selectedReward" (change)="applyFilter()">
+          <option value="">Reward Range ▾</option>
+          <option value="low">Below ₱8,000</option>
+          <option value="mid">₱8,000 - ₱12,000</option>
+          <option value="high">Above ₱12,000</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="selectedDifficulty" (change)="applyFilter()">
+          <option value="">Difficulty ▾</option>
+          <option>Easy</option>
+          <option>Medium</option>
+          <option>Hard</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Quest List -->
+    <div class="quest-list">
+      @for (quest of filteredQuests; track quest.name) {
+        <div class="quest-card">
+          <div class="quest-icon">
+            <img [src]="quest.image" [alt]="quest.name" onerror="this.style.display='none'" />
+            <span class="quest-icon-fallback">⚔️</span>
+          </div>
+          <div class="quest-info">
+            <h3 class="quest-name">{{ quest.name }}</h3>
+            <p class="quest-client">{{ quest.client }}</p>
+            <p class="quest-meta">
+              {{ quest.budget }} &nbsp;•&nbsp;
+              <span [class]="'diff-' + quest.difficulty.toLowerCase()">{{ quest.difficulty }}</span>
+              &nbsp;•&nbsp; {{ quest.skills }}
+            </p>
+            <p class="quest-deadline">Deadline: {{ quest.deadline }}</p>
+          </div>
+          <button class="accept-btn">Accept Quest</button>
+        </div>
+      }
+    </div>
+
+    <!-- Recommended for You -->
+    <div class="recommended-section">
+      <h2 class="recommended-title">Recommended for You</h2>
+      <div class="quest-list">
+        @for (quest of recommendedQuests; track quest.name) {
+          <div class="quest-card">
+            <div class="quest-icon">
+              <img [src]="quest.image" [alt]="quest.name" onerror="this.style.display='none'" />
+              <span class="quest-icon-fallback">⚔️</span>
+            </div>
+            <div class="quest-info">
+              <h3 class="quest-name">{{ quest.name }}</h3>
+              <p class="quest-client">{{ quest.client }}</p>
+              <p class="quest-meta">
+                {{ quest.budget }} &nbsp;•&nbsp;
+                <span [class]="'diff-' + quest.difficulty.toLowerCase()">{{ quest.difficulty }}</span>
+                &nbsp;•&nbsp; {{ quest.skills }}
+              </p>
+              <p class="quest-deadline">Deadline: {{ quest.deadline }}</p>
+            </div>
+            <button class="accept-btn">Accept Quest</button>
+          </div>
+        }
+      </div>
+    </div>
+
+  </main>
+
+</div>

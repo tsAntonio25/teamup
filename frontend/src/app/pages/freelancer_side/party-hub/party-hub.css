@@ -1,0 +1,422 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+/* ── Animated Background Support ── */
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #0d0025;
+  position: relative;
+  color: #fff;
+}
+.page-wrapper,
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  background-color: transparent;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── LOGO ── */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-logo:hover {
+  opacity: 0.85;
+}
+
+.logo-img {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── NAVBAR ── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: linear-gradient(90deg, #C7A4FF 0%, #330778 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(199,164,255,0.2);
+}
+
+.navbar-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-link {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.avatar svg { width: 22px; height: 22px; }
+
+.logout-btn {
+  padding: 6px 18px;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover { background: #fff; color: #330778; }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.page-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  color: #fff;
+  margin: 0;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(18,0,86,0.92);
+  border: 1.5px solid rgba(199,164,255,0.3);
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  background: #E9DBFF;
+  border-radius: 10px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  color: #210251;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  background: transparent;
+  border: none;
+  color: #210251;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.search-input::placeholder { color: rgba(33,2,81,0.5); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #120056;
+  border: 1.5px solid #C7A4FF;
+  border-radius: 14px;
+  padding: 2rem;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  box-shadow: 0 8px 32px rgba(199,164,255,0.3);
+}
+
+.modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.modal-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+
+.form-group label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  padding: 9px 14px;
+  background: rgba(199,164,255,0.1);
+  border: 1px solid rgba(199,164,255,0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.form-group input::placeholder { color: rgba(255,255,255,0.3); }
+.form-group select option { background: #1a0040; color: #fff; }
+
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+.cancel-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1.5px solid rgba(199,164,255,0.4);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover { border-color: #C7A4FF; color: #fff; }
+
+.submit-btn {
+  padding: 8px 20px;
+  background: #C7A4FF;
+  border: none;
+  border-radius: 8px;
+  color: #210251;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submit-btn:hover { background: #b088ff; }
+
+.create-btn {
+  padding: 10px 20px;
+  background: #C7A4FF;
+  border: none;
+  border-radius: 8px;
+  color: #210251;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.create-btn:hover { background: #b088ff; }
+
+/* ── PARTIES SECTION ── */
+.parties-section {
+  background: rgba(18,0,86,0.92);
+  border: 1.5px solid rgba(199,164,255,0.2);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.section-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 14px 20px;
+  margin: 0;
+  background: rgba(75,10,150,0.95);
+  border-bottom: 1px solid rgba(199,164,255,0.2);
+}
+
+/* ── PARTIES GRID ── */
+.parties-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: rgba(199,164,255,0.1);
+  padding: 20px;
+  gap: 16px;
+}
+
+.party-card {
+  background: rgba(55,7,120,0.95);
+  border: 1.5px solid rgba(199,164,255,0.2);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: background 0.15s ease;
+}
+
+.party-card:hover { background: rgba(75,10,150,0.95); }
+
+.party-icon {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.party-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+.party-icon-fallback {
+  position: absolute;
+  font-size: 2.5rem;
+  z-index: 0;
+  display: none;
+}
+
+.party-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.party-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.party-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.party-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.party-size {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.join-btn {
+  padding: 8px 20px;
+  background: #4a9e6a;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.join-btn:hover { background: #3d8a5a; }

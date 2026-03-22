@@ -12,40 +12,44 @@ export class Navbar {
   private readonly authService = inject(AuthService);
   private readonly router      = inject(Router);
 
-  // ── Use AuthService signals directly — no getCurrentUser() needed ──
   readonly user      = this.authService.currentUser;
   readonly userRole  = this.authService.userRole;
 
   readonly navLinks = computed(() => {
     const role = this.userRole();
+
     if (role === 'commissioner') {
       return [
-        { label: 'Dashboard',   path: '/client'             },
-        { label: 'Profile',     path: '/client/profile'     },
-        { label: 'Quest Hub',   path: '/client/quest-hub'   },
-        { label: 'Quest Board', path: '/client/quest-board' },
+        { label: 'Dashboard',    path: '/client'              },
+        { label: 'Profile',      path: '/client/profile'      },
+        { label: 'Quest Hub',    path: '/client/quest-hub'    },
+        { label: 'Quest Board',  path: '/client/quest-board'  },
       ];
     }
-    if (role === 'partyMaster') {
+
+    if (role === 'partyMaster' || role === 'apprentice') {
       return [
-        { label: 'Dashboard',   path: '/freelancer'             },
-        { label: 'Profile',     path: '/freelancer/profile'     },
-        { label: 'Quest Hub',   path: '/freelancer/quest-hub'   },
-        { label: 'Quest Board', path: '/freelancer/quest-board' },
+        { label: 'Dashboard',    path: '/freelancer'              },
+        { label: 'Profile',      path: '/freelancer/profile'      },
+        { label: 'Party Hub',    path: '/freelancer/party-hub'    },
+        { label: 'Quests Board', path: '/freelancer/quests-board' },
+        { label: 'Quests',       path: '/freelancer/quests'       },
       ];
     }
+
     if (role === 'admin') {
       return [
-        { label: 'Dashboard', path: '/admin'        },
-        { label: 'Users',     path: '/admin/users'  },
-        { label: 'Quests',    path: '/admin/quests' },
+        { label: 'Dashboard', path: '/admin/dashboard' },
+        { label: 'Users',     path: '/admin/users'     },
+        { label: 'Quests',    path: '/admin/quest'     },
+        { label: 'Chat Logs', path: '/admin/chat-logs' },
       ];
     }
+
     return [{ label: 'Dashboard', path: '/dashboard' }];
   });
 
   logout(): void {
-    // AuthService.logout() already clears storage + navigates to /login
     this.authService.logout();
   }
 }

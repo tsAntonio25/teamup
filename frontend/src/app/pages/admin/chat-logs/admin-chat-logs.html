@@ -1,5 +1,6 @@
 <div class="shell">
   <app-admin-sidebar></app-admin-sidebar>
+  <admin-bg />
 
   <div class="main-wrap">
     <app-admin-header></app-admin-header>
@@ -10,7 +11,7 @@
       <div class="chat-layout">
         <app-party-list
           [parties]="parties"
-          [selectedPartyId]="selectedParty?.id"
+          [selectedPartyId]="selectedParty.id"
           (partySelected)="onPartySelect($event)">
         </app-party-list>
 

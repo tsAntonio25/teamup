@@ -1,3 +1,4 @@
+import { ClientBackground } from '../client-background';
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -6,7 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-client-overview',
-  imports: [RouterLink, CommonModule, Navbar],
+  imports: [RouterLink, CommonModule, Navbar, ClientBackground],
   templateUrl: './client-overview.html',
   styleUrl: './client-overview.css'
 })

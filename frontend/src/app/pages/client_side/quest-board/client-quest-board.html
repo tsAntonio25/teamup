@@ -1,0 +1,150 @@
+<div class="page-wrapper">
+
+  <app-navbar />
+  <client-bg />
+
+  <main class="content">
+
+    <!-- Page Title -->
+    <h1 class="page-title">Quest Intelligence Board</h1>
+
+    <!-- Quest Hero Card -->
+    <div class="quest-card">
+      <div class="quest-card-logo">
+        <img src="images/angular-dashboard.png" alt="Quest Logo" onerror="this.style.display='none'" />
+      </div>
+      <div class="quest-card-info">
+        <h2 class="quest-card-title">Angular Dashboard Development</h2>
+        <p class="quest-card-party">// Party #5 — Adventurers of Code</p>
+        <div class="quest-card-leader">
+          <div class="leader-avatar">JJ</div>
+          <div class="leader-details">
+            <span class="leader-name">Jeff Johnson</span>
+            <div class="progress-row">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%"></div>
+              </div>
+              <span class="progress-label">65% complete</span>
+            </div>
+          </div>
+        </div>
+        <div class="quest-card-meta">
+          <span>Deadline: <strong>March 30, 2026</strong></span>
+          <span class="quest-status">Status: <strong>In Progress</strong></span>
+        </div>
+      </div>
+      <div class="quest-card-budget">₱18,000</div>
+    </div>
+
+    <!-- Middle Row: Milestone + Activity Log -->
+    <div class="middle-row">
+
+      <!-- Milestone Table -->
+      <div class="milestone-section">
+        <h3 class="section-title">Milestones</h3>
+        <table class="milestone-table">
+          <thead>
+            <tr>
+              <th>Milestone</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of milestones; track m.name) {
+              <tr>
+                <td>{{ m.name }}</td>
+                <td>{{ m.description }}</td>
+                <td>
+                  <span class="ms-badge" [ngClass]="'ms-' + m.status.toLowerCase().split(' ').join('-')">
+                    {{ m.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="activity-section">
+        <div class="activity-header">
+          <h3 class="section-title">Activity Log</h3>
+          <div class="activity-divider"></div>
+          <a routerLink="/client/quest-board" class="view-all">View All →</a>
+        </div>
+        <div class="activity-list">
+          @for (log of activityLogs; track log.time) {
+            <div class="activity-item">
+              <div class="activity-avatar">{{ log.initials }}</div>
+              <div class="activity-content">
+                <p class="activity-text">{{ log.text }}</p>
+              </div>
+              <span class="activity-time">{{ log.time }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chat Log -->
+    <div class="chat-section">
+      <h3 class="section-title">Chat Log</h3>
+
+      <div class="chat-card">
+        <!-- Party Leader Info -->
+        <div class="chat-leader-info">
+          <div class="leader-avatar-lg">JJ</div>
+          <div>
+            <p class="leader-title">Jeff Johnson</p>
+            <p class="leader-role">// Party Leader</p>
+          </div>
+          <div class="online-status">
+            <div class="online-dot"></div>
+            Online
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-area">
+          <div class="date-divider">— Today —</div>
+
+          @for (msg of messages; track $index) {
+            <div class="message-row">
+
+              @if (msg.sender === 'party') {
+                <div class="msg-avatar-sm">{{ msg.initials }}</div>
+                <div class="msg-left">
+                  <span class="msg-name">{{ msg.name }}</span>
+                  <div class="msg-bubble-left">{{ msg.text }}</div>
+                </div>
+              }
+
+              @if (msg.sender === 'client') {
+                <div class="msg-right-wrap">
+                  <div class="msg-bubble-right">{{ msg.text }}</div>
+                </div>
+                <div class="msg-avatar-sm client-avatar">{{ msg.initials }}</div>
+              }
+
+            </div>
+          }
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input-row">
+          <button class="attach-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+            </svg>
+          </button>
+          <input type="text" class="message-input" placeholder="// Type a message..." disabled />
+          <button class="send-btn" disabled>Send</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>

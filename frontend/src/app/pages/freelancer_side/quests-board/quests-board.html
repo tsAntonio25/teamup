@@ -1,0 +1,196 @@
+<div class="page-wrapper">
+
+  <app-navbar />
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1 class="page-title">Quests Intelligence Board</h1>
+
+    <div class="board-layout">
+
+      <!-- LEFT SIDEBAR TABS -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">Tasks</button>
+        <button class="tab-btn" [class.active]="activeTab === 'chat'"  (click)="activeTab = 'chat'">Chat</button>
+      </div>
+
+      <!-- RIGHT MAIN AREA -->
+      <div class="main-area">
+
+        <!-- ── TASKS TAB ── -->
+        @if (activeTab === 'tasks') {
+          <div>
+            <div class="tracker-header">
+              <span>Quest Progress Tracker</span>
+              @if (role === 'party-master') {
+                <button class="add-task-btn"
+                  (click)="tasks.length < 10 ? showAddTask = true : null"
+                  [style.opacity]="tasks.length >= 10 ? '0.5' : '1'"
+                  [title]="tasks.length >= 10 ? 'Maximum 10 tasks reached' : 'Add Task'">
+                  + Add Task ({{ tasks.length }}/10)
+                </button>
+              }
+            </div>
+            <div class="task-list">
+              @for (task of tasks; track task.name; let i = $index) {
+                <div class="task-card">
+                  <div class="task-icon">
+                    <img [src]="task.image" [alt]="task.name" onerror="this.style.display='none'" />
+                  </div>
+                  <div class="task-info">
+                    <h3 class="task-name">{{ task.name }}</h3>
+                    <p class="task-quest">{{ task.quest }}</p>
+                    @if (role === 'party-master') {
+                      <p class="task-assignee">Assigned to: {{ task.assignee }}</p>
+                    }
+                  </div>
+                  <button class="status-btn"
+                    [class]="task.status === 'Completed' ? 'completed-btn' : 'in-progress-btn'">
+                    {{ task.status }}
+                  </button>
+                  @if (role === 'party-master') {
+                    <div class="task-actions">
+                      <button class="edit-task-btn"   (click)="editTask(task, i)">✏️</button>
+                      <button class="delete-task-btn" (click)="deleteTask(i)">🗑️</button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ── CHAT TAB (APPRENTICE) ── -->
+        @if (activeTab === 'chat' && role === 'apprentice') {
+          <div class="chat-section">
+            <div class="chat-card">
+              <div class="chat-leader-info">
+                <div class="leader-avatar-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                  </svg>
+                </div>
+                <p class="leader-title">Party #5 - Adventurers of Code</p>
+              </div>
+              <div class="messages-area">
+                <div class="date-divider">Today</div>
+                @for (msg of partyMessages; track $index) {
+                  <div class="message-row">
+                    @if (msg.sender === 'party') {
+                      <div class="msg-avatar-sm">{{ msg.initials }}</div>
+                      <div class="msg-left">
+                        <span class="msg-name">{{ msg.name }}</span>
+                        <div class="msg-bubble-left">{{ msg.text }}</div>
+                      </div>
+                    }
+                    @if (msg.sender === 'party-master') {
+                      <div class="msg-right-wrap">
+                        <div class="msg-bubble-right">{{ msg.text }}</div>
+                      </div>
+                      <div class="msg-avatar-sm me-avatar">{{ msg.initials }}</div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="message-input-row">
+                <button class="attach-btn" disabled>🔗</button>
+                <input type="text" class="message-input" placeholder="Type a message..." disabled />
+                <button class="send-btn" disabled>Send</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ── CHAT TAB (PARTY MASTER) ── -->
+        @if (activeTab === 'chat' && role === 'party-master') {
+          <div class="chat-pm-layout">
+
+            <!-- All Members -->
+            <div class="members-panel">
+              <h3 class="members-title">All Members</h3>
+              <div class="member-list">
+                @for (member of members; track member.name) {
+                  <div class="member-item">
+                    <div class="member-avatar">{{ member.initials }}</div>
+                    <div class="member-info">
+                      <p class="member-name">{{ member.name }}</p>
+                      <p class="member-role">{{ member.role }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window">
+              <div class="chat-window-header">
+                <span class="chat-window-title">Chat</span>
+              </div>
+              <div class="messages-area">
+                <div class="date-divider">9:45 AM</div>
+                @for (msg of pmMessages; track $index) {
+                  <div class="message-row">
+                    @if (msg.sender === 'apprentice' || msg.sender === 'client') {
+                      <div class="msg-avatar-sm" [class.client-avatar]="msg.sender === 'client'">{{ msg.initials }}</div>
+                      <div class="msg-left">
+                        @if (msg.name) { <span class="msg-name">{{ msg.name }}</span> }
+                        <div class="msg-bubble-left">{{ msg.text }}</div>
+                      </div>
+                    }
+                    @if (msg.sender === 'party-master') {
+                      <div class="msg-right-wrap">
+                        <div class="msg-bubble-right">{{ msg.text }}</div>
+                      </div>
+                      <div class="msg-avatar-sm me-avatar">{{ msg.initials }}</div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="message-input-row">
+                <button class="attach-btn" disabled>🔗</button>
+                <input type="text" class="message-input" placeholder="Type a message..."
+                  [(ngModel)]="newMessage" />
+                <button class="send-btn" (click)="sendMessage()">Send</button>
+              </div>
+            </div>
+
+          </div>
+        }
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD/EDIT TASK MODAL -->
+  @if (showAddTask) {
+    <div class="modal-overlay" (click)="showAddTask = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ editingIndex !== null ? 'Edit Task' : 'Add New Task' }}</h3>
+        <div class="modal-form">
+          <div class="form-group">
+            <label>Task Name</label>
+            <input type="text" [(ngModel)]="newTask.name" placeholder="Task Name" />
+          </div>
+          <div class="form-group">
+            <label>Quest</label>
+            <input type="text" [(ngModel)]="newTask.quest" placeholder="Quest Name" />
+          </div>
+          <div class="form-group">
+            <label>Assign To</label>
+            <select [(ngModel)]="newTask.assignee">
+              <option value="">Select member...</option>
+              @for (m of partyMembers; track m.name) {
+                <option [value]="m.name">{{ m.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="cancel-btn" (click)="showAddTask = false">Cancel</button>
+          <button class="submit-btn" (click)="addTask()">{{ editingIndex !== null ? 'Update Task' : 'Add Task' }}</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

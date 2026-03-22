@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { Observable, of, tap, catchError, throwError, delay } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   User,
@@ -21,35 +21,21 @@ export class AuthService {
   private readonly USER_KEY  = 'teamup_user';
 
   // ─────────────────────────────────────────────────────────────────
-  // 🔧 TEMP: Mock user for frontend testing (no backend needed)
-  // When backend is ready:
-  //   1. Remove the mock user object below
-  //   2. Change back to: signal<User | null>(this.loadUserFromStorage())
-  //   3. Change token back to: signal<string | null>(this.loadTokenFromStorage())
+  // 🔧 SIMULATION MODE — set to false when backend is ready
   // ─────────────────────────────────────────────────────────────────
-  private readonly _currentUser = signal<User | null>({
-    _id:           '1',
-    fullName:      'John Doe',
-    email:         'john@example.com',
-    role:          'commissioner',
-    level:         5,
-    exp:           1420,
-    githubUsername: 'johndoe',
-    phoneNum:      '+63 912 345 6789',
-    location:      'Angeles City, Philippines',
-    professionalInfo: {
-      primarySkills: ['Web Development', 'UI/UX Design'],
-      techStack:     ['Angular', 'TypeScript', 'Node.js']
-    },
-    currentParty: null,
-    createdAt:    '2025-01-01'
-  });
+  private readonly SIMULATION_MODE = true;
 
-  private readonly _token = signal<string | null>('mock-token-for-testing');
+  // Simulated accounts for login testing
+  private readonly MOCK_ACCOUNTS: Record<string, { password: string; role: User['role']; fullName: string }> = {
+    'apprentice@teamup.com': { password: 'Test1234!',       role: 'apprentice',   fullName: 'John Apprentice'   },
+    'master@teamup.com':     { password: 'Test1234!',       role: 'partyMaster',  fullName: 'Party Master Joe'  },
+    'client@teamup.com':     { password: 'Test1234!',       role: 'commissioner', fullName: 'Jane Commissioner' },
+    'admin@teamup.com':      { password: 'teamup-admin1234', role: 'admin',       fullName: 'Super Admin'       },
+  };
 
-  // ─────────────────────────────────────────────────────────────────
-  // Reactive signals — use these anywhere in your app
-  // ─────────────────────────────────────────────────────────────────
+  private readonly _currentUser = signal<User | null>(this.loadUserFromStorage());
+  private readonly _token       = signal<string | null>(this.loadTokenFromStorage());
+
   readonly currentUser    = this._currentUser.asReadonly();
   readonly token          = this._token.asReadonly();
   readonly isLoggedIn     = computed(() => !!this._token() && !!this._currentUser());
@@ -59,8 +45,13 @@ export class AuthService {
   readonly isApprentice   = computed(() => this._currentUser()?.role === 'apprentice');
   readonly isAdmin        = computed(() => this._currentUser()?.role === 'admin');
 
-  // POST /api/auth/login → authController.login()
+  // ─────────────────────────────────────────────────────────────────
+  // LOGIN
+  // ─────────────────────────────────────────────────────────────────
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    if (this.SIMULATION_MODE) {
+      return this.simulateLoginCall(credentials);
+    }
     return this.http
       .post<AuthResponse>(`${this.API}/login`, credentials)
       .pipe(
@@ -69,9 +60,13 @@ export class AuthService {
       );
   }
 
-  // POST /api/auth/register → authController.register()
-  // NOTE: Never send role — backend always sets "apprentice"
+  // ─────────────────────────────────────────────────────────────────
+  // REGISTER
+  // ─────────────────────────────────────────────────────────────────
   register(data: RegisterRequest): Observable<AuthResponse> {
+    if (this.SIMULATION_MODE) {
+      return this.simulateRegisterCall(data);
+    }
     return this.http
       .post<AuthResponse>(`${this.API}/register`, data)
       .pipe(
@@ -86,6 +81,48 @@ export class AuthService {
     this._currentUser.set(null);
     this._token.set(null);
     this.router.navigate(['/login']);
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SIMULATION HELPERS
+  // ─────────────────────────────────────────────────────────────────
+  private simulateLoginCall(credentials: LoginRequest): Observable<AuthResponse> {
+    const account = this.MOCK_ACCOUNTS[credentials.email.toLowerCase()];
+
+    if (!account || account.password !== credentials.password) {
+      return throwError(() => ({
+        message: 'Invalid email or password.'
+      })).pipe(delay(600));
+    }
+
+    const mockResponse = this.buildMockResponse(account.role, account.fullName, credentials.email);
+    this.handleAuthSuccess(mockResponse);
+    return of(mockResponse).pipe(delay(600));
+  }
+
+  private simulateRegisterCall(data: RegisterRequest): Observable<AuthResponse> {
+    const storedRole = localStorage.getItem('teamup_register_role') as User['role'] | null;
+    const role: User['role'] = storedRole === 'commissioner' ? 'commissioner' : 'apprentice';
+    localStorage.removeItem('teamup_register_role');
+
+    const mockResponse = this.buildMockResponse(role, data.fullName, data.email);
+    this.handleAuthSuccess(mockResponse);
+    return of(mockResponse).pipe(delay(800));
+  }
+
+  private buildMockResponse(role: User['role'], fullName: string, email: string): AuthResponse {
+    const user: User = {
+      _id:      `mock-${Date.now()}`,
+      fullName,
+      email,
+      role,
+      level:    role === 'partyMaster' ? 12 : 1,
+      exp:      role === 'partyMaster' ? 3200 : 0,
+      professionalInfo: { primarySkills: [], techStack: [] },
+      currentParty: null,
+      createdAt: new Date().toISOString(),
+    };
+    return { user, token: `mock-token-${role}-${Date.now()}` };
   }
 
   private handleAuthSuccess(res: AuthResponse): void {

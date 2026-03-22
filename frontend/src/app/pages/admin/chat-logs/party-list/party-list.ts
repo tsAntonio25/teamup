@@ -5,7 +5,6 @@ import { Party } from '../admin-chat-logs';
 
 @Component({
   selector: 'app-party-list',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './party-list.html',
   styleUrl: './party-list.css'

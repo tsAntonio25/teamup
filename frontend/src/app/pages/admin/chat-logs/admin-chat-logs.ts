@@ -1,3 +1,4 @@
+import { AdminBackground } from '../admin-background';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
@@ -26,8 +27,7 @@ export interface Party {
 
 @Component({
   selector: 'app-admin-chat-logs',
-  standalone: true,
-  imports: [CommonModule, AdminSidebar, AdminHeader, PartyList, ChatWindow, Footer],
+  imports: [AdminBackground, CommonModule, AdminSidebar, AdminHeader, PartyList, ChatWindow, Footer],
   templateUrl: './admin-chat-logs.html',
   styleUrl: './admin-chat-logs.css'
 })

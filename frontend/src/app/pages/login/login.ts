@@ -46,50 +46,25 @@ export class Login {
 
     const { email, password } = this.form.value;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 🔗 BACKEND INTEGRATION POINT — Login
-    //
-    // This calls AuthService.login() which should POST to your API endpoint.
-    //
-    // Expected endpoint : POST /api/auth/login
-    // Controller        : authController.login()
-    //
-    // Payload shape sent to backend:
-    // {
-    //   email    : string   (required)
-    //   password : string   (required)
-    // }
-    //
-    // Expected success response : { token: string, user: UserObject }
-    //   → token should be saved (localStorage / cookie) inside AuthService
-    //   → navigates to /dashboard on success
-    //
-    // Expected error response   : { message: string }
-    //   e.g. "Invalid email or password"
-    //   → displays message in the error banner at the top of the form
-    //
-    // "Remember Me" checkbox value is available as:
-    //   this.form.value.rememberMe  (boolean)
-    //   → pass to AuthService if your backend supports persistent sessions,
-    //     or use it to decide between localStorage vs sessionStorage for the token
-    //
-    // To connect: make sure AuthService.login() points to the correct base URL.
-    // Check/set the API base URL in:
-    //   src/app/core/services/auth.service.ts  → look for HttpClient.post(...)
-    //   src/environments/environment.ts        → set apiUrl to your backend URL
-    //   proxy.conf.json                        → if using Angular dev proxy for /api
-    // ─────────────────────────────────────────────────────────────────────────
-
     this.authService.login({ email: email!, password: password! }).subscribe({
-      next: () => {
+      next: (res) => {
         this.isLoading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.redirectByRole(res.user.role);
       },
       error: (err) => {
         this.isLoading.set(false);
-        // Backend returns: { message: "Invalid email or password" }
         this.apiError.set(err.message ?? 'Login failed. Please try again.');
       }
     });
+  }
+
+  private redirectByRole(role: string): void {
+    switch (role) {
+      case 'commissioner': this.router.navigate(['/client']);           break;
+      case 'partyMaster':  this.router.navigate(['/freelancer']);       break;
+      case 'apprentice':   this.router.navigate(['/freelancer']);       break;
+      case 'admin':        this.router.navigate(['/admin/dashboard']);  break;
+      default:             this.router.navigate(['/dashboard']);
+    }
   }
 }

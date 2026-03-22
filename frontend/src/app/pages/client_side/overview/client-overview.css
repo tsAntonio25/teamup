@@ -1,5 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
+/* ═══════════════════════════════════════════════════════
+   TEAMUP CLIENT — Animated Canvas Background
+   Canvas is injected by ClientBackground directive
+═══════════════════════════════════════════════════════ */
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #0d0025;
+  position: relative;
+  color: #e2d0f7;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.page-wrapper,
+.db-page,
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.page-wrapper,
+.db-page,
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+
 /* ── Host ── */
 :host {
   display: block;

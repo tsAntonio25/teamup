@@ -1,3 +1,4 @@
+import { AdminBackground } from '../admin-background';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
@@ -18,8 +19,7 @@ export interface User {
 
 @Component({
   selector: 'app-admin-users',
-  standalone: true,
-  imports: [CommonModule, AdminSidebar, AdminHeader, Footer, UsersFilter, UsersTable],
+  imports: [AdminBackground, CommonModule, AdminSidebar, AdminHeader, Footer, UsersFilter, UsersTable],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css'
 })

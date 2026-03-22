@@ -1,0 +1,87 @@
+<div class="page-wrapper">
+
+  <app-navbar />
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- CREATE PARTY MODAL -->
+    @if (showCreateParty) {
+      <div class="modal-overlay" (click)="showCreateParty = false">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <h3 class="modal-title">Create Party</h3>
+          <div class="modal-form">
+            <div class="form-group">
+              <label>Party Name</label>
+              <input type="text" [(ngModel)]="newParty.name" placeholder="Party Name" />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <input type="text" [(ngModel)]="newParty.description" placeholder="Description" />
+            </div>
+            <div class="form-group">
+              <label>Required Skills</label>
+              <input type="text" [(ngModel)]="newParty.skills" placeholder="Skills" />
+            </div>
+            <div class="form-group">
+              <label>Max Members</label>
+              <input type="number" [(ngModel)]="newParty.max" [value]="3" min="3" max="3" />
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="cancel-btn" (click)="showCreateParty = false">Cancel</button>
+            <button class="submit-btn" (click)="createParty()">Create Party</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Party Hub</h1>
+      <p class="page-sub">You are not currently in a party. Join a party to team up with other freelancers for collaborative quests.</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search parties..."
+          [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+      </div>
+      @if (role === 'party-master') {
+        <button class="create-btn" (click)="showCreateParty = true">
+          + Create Party (Senior Only)
+        </button>
+      }
+    </div>
+
+    <!-- Available Parties -->
+    <div class="parties-section">
+      <h2 class="section-label">Available Parties</h2>
+      <div class="parties-grid">
+        @for (party of filteredParties; track party.name) {
+          <div class="party-card">
+            <div class="party-icon">
+              <img [src]="party.image" [alt]="party.name" onerror="this.style.display='none'" />
+              <span class="party-icon-fallback">⚔️</span>
+            </div>
+            <div class="party-info">
+              <h3 class="party-name">{{ party.name }}</h3>
+              <p class="party-desc">{{ party.description }}</p>
+              <div class="party-footer">
+                <span class="party-size">Party Size: {{ party.current }}/{{ party.max }}</span>
+                <button class="join-btn" (click)="joinParty(party)">Join Party</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+  </main>
+
+</div>
