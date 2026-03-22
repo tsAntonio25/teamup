@@ -5,15 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
 
 export interface Quest {
-  name: string;
-  tags: string;
+  name: string; tags: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
-  budget: string;
-  deadline: string;
-  deadlineSub: string;
+  budget: string; deadline: string; deadlineSub: string;
   status: 'In Progress' | 'Completed' | 'Cancelled';
-  party: string;
-  partyMembers: string;
+  party: string; partyMembers: string;
 }
 
 @Component({
@@ -28,18 +24,18 @@ export class ClientQuestHub {
   searchTerm = '';
 
   stats = [
-    { label: 'Total Quests',     value: '12',      icon: '📋', colorClass: 'card-default' },
-    { label: 'Active Quests',    value: '4',        icon: '🟢', colorClass: 'card-green'   },
-    { label: 'Completed Quests', value: '8',        icon: '✅', colorClass: 'card-orange'  },
-    { label: 'Total Spent',      value: '₱43,000',  icon: '💰', colorClass: 'card-purple'  },
+    { label: 'Total Quests', value: '12', icon: 'grid'   },
+    { label: 'In Progress',  value: '4',  icon: 'clock'  },
+    { label: 'Completed',    value: '8',  icon: 'check'  },
+    { label: 'Cancelled',    value: '0',  icon: 'cancel' },
   ];
 
   quests: Quest[] = [
-    { name: 'E-Commerce Website Development', tags: 'Angular, Node.js, MongoDB', difficulty: 'Hard',   budget: '₱12,000', deadline: 'March 30, 2026', deadlineSub: '(10 days left)', status: 'In Progress', party: '#12', partyMembers: '3 members' },
-    { name: 'Portfolio Website',              tags: 'HTML, CSS, JavaScript',      difficulty: 'Easy',   budget: '₱5,000',  deadline: 'March 10, 2026', deadlineSub: '(Completed)',    status: 'Completed',   party: '#8',  partyMembers: '3 members' },
-    { name: 'Mobile App UI Design',           tags: 'Figma, Adobe XD',            difficulty: 'Medium', budget: '₱7,500',  deadline: 'April 2, 2026',  deadlineSub: '(13 days left)', status: 'In Progress', party: '#15', partyMembers: '3 members' },
-    { name: 'Backend API Development',        tags: 'Python, Django, PostgreSQL',  difficulty: 'Hard',   budget: '₱15,000', deadline: 'April 5, 2026',  deadlineSub: '(16 days left)', status: 'In Progress', party: '#4',  partyMembers: '3 members' },
-    { name: 'Logo and Branding',              tags: 'Illustrator, Photoshop',      difficulty: 'Easy',   budget: '₱3,500',  deadline: 'March 07, 2026', deadlineSub: '(Completed)',    status: 'Completed',   party: '#10', partyMembers: '3 members' },
+    { name: 'E-Commerce Website Development', tags: 'Angular, Node.js, MongoDB',  difficulty: 'Hard',   budget: '₱12,000', deadline: 'March 30, 2026', deadlineSub: '10 days left', status: 'In Progress', party: '#12', partyMembers: '3 members' },
+    { name: 'Portfolio Website',              tags: 'HTML, CSS, JavaScript',       difficulty: 'Easy',   budget: '₱5,000',  deadline: 'March 10, 2026', deadlineSub: 'Completed',    status: 'Completed',   party: '#8',  partyMembers: '3 members' },
+    { name: 'Mobile App UI Design',           tags: 'Figma, Adobe XD',             difficulty: 'Medium', budget: '₱7,500',  deadline: 'April 2, 2026',  deadlineSub: '13 days left', status: 'In Progress', party: '#15', partyMembers: '3 members' },
+    { name: 'Backend API Development',        tags: 'Python, Django, PostgreSQL',  difficulty: 'Hard',   budget: '₱15,000', deadline: 'April 5, 2026',  deadlineSub: '16 days left', status: 'In Progress', party: '#4',  partyMembers: '3 members' },
+    { name: 'Logo and Branding',              tags: 'Illustrator, Photoshop',      difficulty: 'Easy',   budget: '₱3,500',  deadline: 'March 07, 2026', deadlineSub: 'Completed',    status: 'Completed',   party: '#10', partyMembers: '3 members' },
   ];
 
   get filteredQuests(): Quest[] {

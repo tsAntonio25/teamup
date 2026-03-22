@@ -20,9 +20,9 @@ export class ClientQuestBoard {
 
   activityLogs = [
     { initials: 'JJ', text: 'Jeff Johnson submitted Milestone 2 for review.',              time: '5 mins ago'  },
-    { initials: '👥', text: 'Party updated quest progress to 65%',                         time: '20 mins ago' },
+    { initials: 'PTY', text: 'Party updated quest progress to 65%',                         time: '20 mins ago' },
     { initials: 'JJ', text: 'Jeff Johnson requested feedback for frontend implementation',  time: '1 hr ago'    },
-    { initials: '👥', text: 'Party uploaded UI files to GitHub repository',                 time: 'Yesterday'   },
+    { initials: 'PTY', text: 'Party uploaded UI files to GitHub repository',                 time: 'Yesterday'   },
     { initials: 'ME', text: 'You approved UI Wireframes for Milestone 1',                  time: '2 days ago'  },
   ];
 

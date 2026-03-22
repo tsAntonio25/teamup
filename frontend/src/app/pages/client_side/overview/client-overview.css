@@ -1,41 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
-/* ═══════════════════════════════════════════════════════
-   TEAMUP CLIENT — Animated Canvas Background
-   Canvas is injected by ClientBackground directive
-═══════════════════════════════════════════════════════ */
+/* ── Host ── */
+/* ── Host: fixes background stuck + scroll ── */
 :host {
   display: block;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
-  background-color: #0d0025;
-  position: relative;
-  color: #e2d0f7;
-  font-family: 'Rajdhani', sans-serif;
-}
-
-.page-wrapper,
-.db-page,
-.content {
-  position: relative;
-  z-index: 1;
-}
-
-
-
-.page-wrapper,
-.db-page,
-.content {
-  position: relative;
-  z-index: 1;
-}
-
-
-/* ── Host ── */
-:host {
-  display: block;
-  width: 100%;
   overflow-x: hidden;
   color: #e2d0f7;
   font-family: 'Rajdhani', sans-serif;
@@ -44,6 +14,7 @@
     linear-gradient(rgba(244,114,182,0.07) 1px, transparent 1px),
     linear-gradient(90deg, rgba(139,92,246,0.07) 1px, transparent 1px);
   background-size: 60px 60px;
+  background-attachment: scroll;
   animation: globalGrid 25s linear infinite;
 }
 @keyframes globalGrid {
@@ -51,8 +22,13 @@
   100% { background-position: 60px 60px, 60px 60px; }
 }
 
+@keyframes globalGrid {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 60px 60px, 60px 60px; }
+}
+
 /* ── Page wrapper ── */
-.db-page {
+.db-page { position: relative; z-index: 1;
   max-width: 1400px;
   margin: 0 auto;
   padding: 80px 2rem 3rem;
@@ -423,7 +399,7 @@
 }
 
 @media (max-height: 820px) and (min-width: 769px) {
-  .db-page { padding: 70px 1.5rem 2rem; }
+  .db-page { position: relative; z-index: 1; padding: 70px 1.5rem 2rem; }
   .db-welcome { min-height: 150px; }
   .db-welcome__content { padding: 1.5rem 2rem; }
   .db-welcome__name { font-size: clamp(1.5rem, 3.5vw, 2.4rem); }
@@ -435,7 +411,7 @@
 }
 
 @media (max-width: 768px) {
-  .db-page { padding: 72px 1rem 2rem; }
+  .db-page { position: relative; z-index: 1; padding: 72px 1rem 2rem; }
   .db-grid { grid-template-columns: 1fr; }
   .db-welcome__char { display: none; }
   .db-welcome__name { font-size: 1.8rem; }

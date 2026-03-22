@@ -1,40 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
-/* ═══════════════════════════════════════════════════════
-   TEAMUP CLIENT — Animated Canvas Background
-   Canvas is injected by ClientBackground directive
-═══════════════════════════════════════════════════════ */
+/* ── Host: fixes background stuck + scroll ── */
 :host {
   display: block;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
-  background-color: #0d0025;
-  position: relative;
-  color: #e2d0f7;
-  font-family: 'Rajdhani', sans-serif;
-}
-
-.page-wrapper,
-.db-page,
-.content {
-  position: relative;
-  z-index: 1;
-}
-
-
-
-.page-wrapper,
-.db-page,
-.content {
-  position: relative;
-  z-index: 1;
-}
-
-
-:host {
-  display: block;
-  width: 100%;
   overflow-x: hidden;
   color: #e2d0f7;
   font-family: 'Rajdhani', sans-serif;
@@ -43,8 +13,14 @@
     linear-gradient(rgba(244,114,182,0.07) 1px, transparent 1px),
     linear-gradient(90deg, rgba(139,92,246,0.07) 1px, transparent 1px);
   background-size: 60px 60px;
+  background-attachment: scroll;
   animation: globalGrid 25s linear infinite;
 }
+@keyframes globalGrid {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 60px 60px, 60px 60px; }
+}
+
 @keyframes globalGrid {
   0%   { background-position: 0 0, 0 0; }
   100% { background-position: 60px 60px, 60px 60px; }

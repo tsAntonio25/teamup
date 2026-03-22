@@ -5,13 +5,11 @@
 
   <main class="content">
 
-    <!-- Page Header -->
     <div class="page-header">
       <h1 class="page-title">Quest Hub</h1>
       <button class="create-btn">+ Create Quest</button>
     </div>
 
-    <!-- Filter Tabs + Search -->
     <div class="filter-bar">
       <div class="filter-tabs">
         <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">All Quests</button>
@@ -20,30 +18,38 @@
         <button class="tab-btn" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">Cancelled</button>
       </div>
       <div class="search-box">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="text" class="search-input" placeholder="Search quests..." [(ngModel)]="searchTerm" />
       </div>
     </div>
 
-    <!-- Stat Cards -->
     <div class="stat-grid">
       @for (stat of stats; track stat.label) {
-        <div class="stat-card" [ngClass]="stat.colorClass">
-          <div class="stat-icon">
-            <svg *ngIf="stat.label === 'Total Quests'" viewBox="0 0 24 24" stroke="#C7A4FF" fill="none" stroke-width="1.5">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
-            <svg *ngIf="stat.label === 'Active Quests'" viewBox="0 0 24 24" stroke="#22c55e" fill="none" stroke-width="1.5">
-              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
-            </svg>
-            <svg *ngIf="stat.label === 'Completed Quests'" viewBox="0 0 24 24" stroke="#f59e0b" fill="none" stroke-width="1.5">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <svg *ngIf="stat.label === 'Total Spent'" viewBox="0 0 24 24" stroke="#a855f7" fill="none" stroke-width="1.5">
-              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-            </svg>
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            @if (stat.icon === 'grid') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            }
+            @if (stat.icon === 'clock') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+              </svg>
+            }
+            @if (stat.icon === 'check') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            }
+            @if (stat.icon === 'cancel') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            }
           </div>
           <div class="stat-info">
             <p class="stat-label">{{ stat.label }}</p>
@@ -53,7 +59,6 @@
       }
     </div>
 
-    <!-- My Quests Table -->
     <div class="quests-card">
       <h2 class="quests-title">
         My Quests
