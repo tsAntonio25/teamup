@@ -5,12 +5,11 @@
 
   <main class="content">
 
-    <!-- Page Title -->
     <h1 class="page-title">Quest Intelligence Board</h1>
 
-    <!-- Quest Hero Card -->
+    <!-- Quest Card -->
     <div class="quest-card">
-      <div class="quest-card-logo">
+      <div class="quest-card-logo" style="display:none" #logoWrap>
         <img src="images/angular-dashboard.png" alt="Quest Logo" onerror="this.style.display='none'" />
       </div>
       <div class="quest-card-info">
@@ -24,19 +23,19 @@
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 65%"></div>
               </div>
-              <span class="progress-label">65% complete</span>
+              <span class="progress-label">65%</span>
             </div>
           </div>
         </div>
         <div class="quest-card-meta">
-          <span>Deadline: <strong>March 30, 2026</strong></span>
-          <span class="quest-status">Status: <strong>In Progress</strong></span>
+          <span>Deadline: March 30, 2026</span>
+          <span class="quest-status">Status: In Progress</span>
         </div>
       </div>
       <div class="quest-card-budget">₱18,000</div>
     </div>
 
-    <!-- Middle Row: Milestone + Activity Log -->
+    <!-- Middle Row -->
     <div class="middle-row">
 
       <!-- Milestone Table -->
@@ -56,7 +55,7 @@
                 <td>{{ m.name }}</td>
                 <td>{{ m.description }}</td>
                 <td>
-                  <span class="ms-badge" [ngClass]="'ms-' + m.status.toLowerCase().split(' ').join('-')">
+                  <span class="ms-badge" [class]="'ms-' + m.status.toLowerCase().split(' ').join('-')">
                     {{ m.status }}
                   </span>
                 </td>
@@ -71,10 +70,10 @@
         <div class="activity-header">
           <h3 class="section-title">Activity Log</h3>
           <div class="activity-divider"></div>
-          <a routerLink="/client/quest-board" class="view-all">View All →</a>
+          <a routerLink="/client/quest-board" class="view-all">View All</a>
         </div>
         <div class="activity-list">
-          @for (log of activityLogs; track log.time) {
+          @for (log of activityLogs; track $index) {
             <div class="activity-item">
               <div class="activity-avatar">{{ log.initials }}</div>
               <div class="activity-content">
@@ -91,9 +90,7 @@
     <!-- Chat Log -->
     <div class="chat-section">
       <h3 class="section-title">Chat Log</h3>
-
       <div class="chat-card">
-        <!-- Party Leader Info -->
         <div class="chat-leader-info">
           <div class="leader-avatar-lg">JJ</div>
           <div>
@@ -106,13 +103,10 @@
           </div>
         </div>
 
-        <!-- Messages -->
         <div class="messages-area">
           <div class="date-divider">— Today —</div>
-
           @for (msg of messages; track $index) {
             <div class="message-row">
-
               @if (msg.sender === 'party') {
                 <div class="msg-avatar-sm">{{ msg.initials }}</div>
                 <div class="msg-left">
@@ -120,23 +114,20 @@
                   <div class="msg-bubble-left">{{ msg.text }}</div>
                 </div>
               }
-
               @if (msg.sender === 'client') {
                 <div class="msg-right-wrap">
                   <div class="msg-bubble-right">{{ msg.text }}</div>
                 </div>
                 <div class="msg-avatar-sm client-avatar">{{ msg.initials }}</div>
               }
-
             </div>
           }
         </div>
 
-        <!-- Message Input -->
         <div class="message-input-row">
           <button class="attach-btn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
             </svg>
           </button>
           <input type="text" class="message-input" placeholder="// Type a message..." disabled />

@@ -2,40 +2,37 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
+import { FreelancerBackground } from '../freelancer-background';
 
 export interface Task {
-  name: string;
-  quest: string;
-  image: string;
-  status: 'In Progress' | 'Completed';
-  assignee: string;
+  name: string; quest: string; image: string;
+  status: 'In Progress' | 'Completed'; assignee: string;
 }
 
 export interface Member {
-  name: string;
-  initials: string;
-  role: string;
+  name: string; initials: string; role: string;
 }
 
 @Component({
   selector: 'app-quests-board',
-  imports: [CommonModule, FormsModule, Navbar],
+  standalone: true,
+  imports: [CommonModule, FormsModule, Navbar, FreelancerBackground],
   templateUrl: './quests-board.html',
   styleUrl: './quests-board.css'
 })
 export class QuestsBoard {
 
   role: 'apprentice' | 'party-master' = 'party-master';
-  activeTab = 'tasks';
-  showAddTask = false;
-  newMessage = '';
+  activeTab    = 'tasks';
+  showAddTask  = false;
+  newMessage   = '';
   newTask: Partial<Task> = { name: '', quest: '', assignee: '' };
 
   members: Member[] = [
     { name: 'John Doe',       initials: 'JD', role: 'Frontend' },
-    { name: 'Jane Smith',     initials: 'JS', role: 'Designer' },
-    { name: 'David Williams', initials: 'DW', role: 'Backend'  },
-    { name: 'Maria Santos',   initials: 'MS', role: 'Client'   },
+    { name: 'Jane Smith',     initials: 'JS', role: 'Designer'  },
+    { name: 'David Williams', initials: 'DW', role: 'Backend'   },
+    { name: 'Maria Santos',   initials: 'MS', role: 'Client'    },
   ];
 
   get partyMembers(): Member[] { return this.members.filter(m => m.role !== 'Client'); }
@@ -68,8 +65,8 @@ export class QuestsBoard {
 
   editTask(task: Task, index: number): void {
     this.editingIndex = index;
-    this.newTask = { ...task };
-    this.showAddTask = true;
+    this.newTask      = { ...task };
+    this.showAddTask  = true;
   }
 
   deleteTask(index: number): void {
@@ -82,24 +79,24 @@ export class QuestsBoard {
     if (this.newTask.name && this.newTask.assignee) {
       if (this.editingIndex !== null) {
         this.tasks[this.editingIndex] = {
-          name: this.newTask.name!,
-          quest: this.newTask.quest || 'E-Commerce Website Development',
-          image: 'images/quest-ecommerce.png',
-          status: this.tasks[this.editingIndex].status,
+          name:     this.newTask.name!,
+          quest:    this.newTask.quest || 'E-Commerce Website Development',
+          image:    'images/quest-ecommerce.png',
+          status:   this.tasks[this.editingIndex].status,
           assignee: this.newTask.assignee!
         };
         this.editingIndex = null;
       } else {
         if (this.tasks.length >= 10) return;
         this.tasks.push({
-          name: this.newTask.name!,
-          quest: this.newTask.quest || 'E-Commerce Website Development',
-          image: 'images/quest-ecommerce.png',
-          status: 'In Progress',
+          name:     this.newTask.name!,
+          quest:    this.newTask.quest || 'E-Commerce Website Development',
+          image:    'images/quest-ecommerce.png',
+          status:   'In Progress',
           assignee: this.newTask.assignee!
         });
       }
-      this.newTask = { name: '', quest: '', assignee: '' };
+      this.newTask     = { name: '', quest: '', assignee: '' };
       this.showAddTask = false;
     }
   }
