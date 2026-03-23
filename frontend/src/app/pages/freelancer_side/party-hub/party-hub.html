@@ -1,15 +1,13 @@
 <div class="page-wrapper">
-
   <app-navbar />
   <freelancer-bg />
 
   <main class="content">
 
-    <!-- Create Party Modal -->
     @if (showCreateParty) {
       <div class="modal-overlay" (click)="showCreateParty = false">
         <div class="modal" (click)="$event.stopPropagation()">
-          <h3 class="modal-title">Create Party</h3>
+          <h3 class="modal-title">Create New Party</h3>
           <div class="modal-form">
             <div class="form-group">
               <label>Party Name</label>
@@ -17,58 +15,52 @@
             </div>
             <div class="form-group">
               <label>Description</label>
-              <input type="text" [(ngModel)]="newParty.description" placeholder="Describe your party" />
+              <textarea [(ngModel)]="newParty.description" placeholder="What is your party's goal?"></textarea>
             </div>
             <div class="form-group">
-              <label>Required Skills</label>
-              <input type="text" [(ngModel)]="newParty.skills" placeholder="e.g. Angular, Node.js" />
-            </div>
-            <div class="form-group">
-              <label>Max Members</label>
-              <input type="number" [(ngModel)]="newParty.max" [value]="3" min="2" max="5" />
+              <label>Tech Stack / Skills</label>
+              <input type="text" [(ngModel)]="newParty.techStack" placeholder="e.g. Angular, Node.js, MongoDB" />
+              <small>Separate with commas</small>
             </div>
           </div>
           <div class="modal-actions">
             <button class="cancel-btn" (click)="showCreateParty = false">Cancel</button>
-            <button class="submit-btn" (click)="createParty()">Create Party</button>
+            <button class="submit-btn" [disabled]="!newParty.name" (click)="createParty()">Launch Party</button>
           </div>
         </div>
       </div>
     }
 
-    <!-- Page Header -->
     <div class="page-header">
       <div>
         <h1 class="page-title">Party Hub</h1>
-        <p class="page-sub">Join a party to team up with other freelancers for collaborative quests.</p>
+        <p class="page-sub">Team up with other freelancers to take on high-level quests.</p>
       </div>
-      @if (role === 'party-master') {
+      
+      @if (user()?.role === 'partyMaster') {
         <button class="create-btn" (click)="showCreateParty = true">
-          + Create Party
+          <span class="plus-icon">+</span> Create Party
         </button>
       }
     </div>
 
-    <!-- Filter Bar -->
     <div class="filter-bar">
       <div class="search-box">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" class="search-input" placeholder="Search parties..."
-          [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
+        <input type="text" class="search-input" placeholder="Search by name or tech stack..."
+          [value]="searchTerm()" (input)="updateSearch($event)" />
       </div>
     </div>
 
-    <!-- Available Parties -->
     <div class="parties-section">
-      <h2 class="section-label">Available Parties</h2>
+      <h2 class="section-label">Active Formations</h2>
       <div class="parties-grid">
-        @for (party of filteredParties; track party.name) {
+        @for (party of filteredParties(); track party._id) {
           <div class="party-card">
             <div class="party-icon">
-              <img [src]="party.image" [alt]="party.name" onerror="this.style.display='none'" />
-              <svg viewBox="0 0 24 24">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -78,11 +70,29 @@
             <div class="party-info">
               <h3 class="party-name">{{ party.name }}</h3>
               <p class="party-desc">{{ party.description }}</p>
+              
+              <div class="tech-tags">
+                @for (tech of party.techStack; track tech) {
+                  <span class="tech-tag">{{ tech }}</span>
+                }
+              </div>
+
               <div class="party-footer">
-                <span class="party-size">{{ party.current }}/{{ party.max }} members</span>
-                <button class="join-btn" (click)="joinParty(party)">Join Party</button>
+                <span class="party-size" [class.full]="party.apprentices?.length >= 2">
+                  {{ (party.apprentices?.length || 0) + 1 }}/3 Members
+                </span>
+                
+                <button class="join-btn" 
+                        [disabled]="party.status !== 'forming' || user()?.currentParty"
+                        (click)="joinParty(party._id)">
+                  {{ user()?.currentParty === party._id ? 'Member' : 'Join' }}
+                </button>
               </div>
             </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No parties found matching your search.</p>
           </div>
         }
       </div>
