@@ -67,16 +67,16 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // get total commits for role change
-        if (user.githubUsername) {
+        // get total commits for role change (apprentice only)
+        if (user.role === "apprentice" && user.githubUsername) {
             const commits = await getUserTotalCommits(user.githubUsername);
-            const newRole = commits >= 3000 ? "partyMaster" : "apprentice";
 
-            if (user.role !== newRole) {
-                user.role = newRole;
+            if (commits >= 3000) {
+                user.role = "partyMaster";
                 await user.save();
             }
         }
+
 
         res.json({
             user: {
