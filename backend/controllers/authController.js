@@ -3,7 +3,7 @@ import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
 import { getUserTotalCommits } from "../services/githubService.js";
 
-// register new user
+// register new user (POST)
 export const register = async (req, res) => {
     try {
         const { fullName, email, password, role, githubUsername, phoneNum, location, professionalInfo } = req.body;
@@ -51,7 +51,7 @@ export const register = async (req, res) => {
     }
 };
 
-// login existing user
+// login existing user (POST)
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -98,3 +98,25 @@ export const login = async (req, res) => {
         });
     }
 };
+
+// user profile (GET)
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .select("-password")
+            .populate("currentParty");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(user);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch profile",
+            error: error.message
+        });
+    }
+};
+
