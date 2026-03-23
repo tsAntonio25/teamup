@@ -2,18 +2,16 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
+import { FreelancerBackground } from '../freelancer-background';
 
 export interface Party {
-  name: string;
-  description: string;
-  image: string;
-  current: number;
-  max: number;
+  name: string; description: string; image: string; current: number; max: number;
 }
 
 @Component({
   selector: 'app-party-hub',
-  imports: [CommonModule, FormsModule, Navbar],
+  standalone: true,
+  imports: [CommonModule, FormsModule, Navbar, FreelancerBackground],
   templateUrl: './party-hub.html',
   styleUrl: './party-hub.css'
 })

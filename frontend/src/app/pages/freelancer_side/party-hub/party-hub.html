@@ -1,11 +1,11 @@
 <div class="page-wrapper">
 
   <app-navbar />
+  <freelancer-bg />
 
-  <!-- CONTENT -->
   <main class="content">
 
-    <!-- CREATE PARTY MODAL -->
+    <!-- Create Party Modal -->
     @if (showCreateParty) {
       <div class="modal-overlay" (click)="showCreateParty = false">
         <div class="modal" (click)="$event.stopPropagation()">
@@ -13,19 +13,19 @@
           <div class="modal-form">
             <div class="form-group">
               <label>Party Name</label>
-              <input type="text" [(ngModel)]="newParty.name" placeholder="Party Name" />
+              <input type="text" [(ngModel)]="newParty.name" placeholder="Enter party name" />
             </div>
             <div class="form-group">
               <label>Description</label>
-              <input type="text" [(ngModel)]="newParty.description" placeholder="Description" />
+              <input type="text" [(ngModel)]="newParty.description" placeholder="Describe your party" />
             </div>
             <div class="form-group">
               <label>Required Skills</label>
-              <input type="text" [(ngModel)]="newParty.skills" placeholder="Skills" />
+              <input type="text" [(ngModel)]="newParty.skills" placeholder="e.g. Angular, Node.js" />
             </div>
             <div class="form-group">
               <label>Max Members</label>
-              <input type="number" [(ngModel)]="newParty.max" [value]="3" min="3" max="3" />
+              <input type="number" [(ngModel)]="newParty.max" [value]="3" min="2" max="5" />
             </div>
           </div>
           <div class="modal-actions">
@@ -38,25 +38,26 @@
 
     <!-- Page Header -->
     <div class="page-header">
-      <h1 class="page-title">Party Hub</h1>
-      <p class="page-sub">You are not currently in a party. Join a party to team up with other freelancers for collaborative quests.</p>
+      <div>
+        <h1 class="page-title">Party Hub</h1>
+        <p class="page-sub">Join a party to team up with other freelancers for collaborative quests.</p>
+      </div>
+      @if (role === 'party-master') {
+        <button class="create-btn" (click)="showCreateParty = true">
+          + Create Party
+        </button>
+      }
     </div>
 
     <!-- Filter Bar -->
     <div class="filter-bar">
       <div class="search-box">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="text" class="search-input" placeholder="Search parties..."
           [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()" />
       </div>
-      @if (role === 'party-master') {
-        <button class="create-btn" (click)="showCreateParty = true">
-          + Create Party (Senior Only)
-        </button>
-      }
     </div>
 
     <!-- Available Parties -->
@@ -67,13 +68,18 @@
           <div class="party-card">
             <div class="party-icon">
               <img [src]="party.image" [alt]="party.name" onerror="this.style.display='none'" />
-              <span class="party-icon-fallback">⚔️</span>
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
             </div>
             <div class="party-info">
               <h3 class="party-name">{{ party.name }}</h3>
               <p class="party-desc">{{ party.description }}</p>
               <div class="party-footer">
-                <span class="party-size">Party Size: {{ party.current }}/{{ party.max }}</span>
+                <span class="party-size">{{ party.current }}/{{ party.max }} members</span>
                 <button class="join-btn" (click)="joinParty(party)">Join Party</button>
               </div>
             </div>
@@ -83,5 +89,4 @@
     </div>
 
   </main>
-
 </div>

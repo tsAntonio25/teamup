@@ -2,30 +2,23 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
+import { FreelancerBackground } from '../freelancer-background';
 
 export interface Quest {
-  name: string;
-  client: string;
-  budget: string;
-  budgetNum: number;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  skills: string;
-  deadline: string;
-  image: string;
+  name: string; client: string; budget: string; budgetNum: number;
+  difficulty: 'Easy' | 'Medium' | 'Hard'; skills: string; deadline: string; image: string;
 }
 
 @Component({
   selector: 'app-freelancer-quests',
-  imports: [CommonModule, FormsModule, Navbar],
+  standalone: true,
+  imports: [CommonModule, FormsModule, Navbar, FreelancerBackground],
   templateUrl: './quests.html',
   styleUrl: './quests.css'
 })
 export class FreelancerQuests {
 
-  searchTerm = '';
-  selectedSkill = '';
-  selectedReward = '';
-  selectedDifficulty = '';
+  searchTerm = ''; selectedSkill = ''; selectedReward = ''; selectedDifficulty = '';
 
   quests: Quest[] = [
     { name: 'Restaurant Website Redesign',    client: 'Maria Santos',      budget: '₱12,000', budgetNum: 12000, difficulty: 'Medium', skills: 'Figma, HTML, CSS',                         deadline: 'May 25, 2026',  image: 'images/quest-restaurant.png'  },
@@ -49,8 +42,7 @@ export class FreelancerQuests {
       const matchesSearch     = q.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || q.client.toLowerCase().includes(this.searchTerm.toLowerCase());
       const matchesSkill      = !this.selectedSkill || q.skills.includes(this.selectedSkill);
       const matchesDifficulty = !this.selectedDifficulty || q.difficulty === this.selectedDifficulty;
-      const matchesReward     =
-        !this.selectedReward ||
+      const matchesReward     = !this.selectedReward ||
         (this.selectedReward === 'low'  && q.budgetNum < 8000) ||
         (this.selectedReward === 'mid'  && q.budgetNum >= 8000 && q.budgetNum <= 12000) ||
         (this.selectedReward === 'high' && q.budgetNum > 12000);
