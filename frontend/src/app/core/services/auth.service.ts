@@ -23,7 +23,7 @@ export class AuthService {
   // ─────────────────────────────────────────────────────────────────
   // 🔧 SIMULATION MODE — set to false when backend is ready
   // ─────────────────────────────────────────────────────────────────
-  private readonly SIMULATION_MODE = true;
+  private readonly SIMULATION_MODE = false;
 
   // Simulated accounts for login testing
   private readonly MOCK_ACCOUNTS: Record<string, { password: string; role: User['role']; fullName: string }> = {
@@ -82,6 +82,7 @@ export class AuthService {
     this._token.set(null);
     this.router.navigate(['/login']);
   }
+
 
   // ─────────────────────────────────────────────────────────────────
   // SIMULATION HELPERS

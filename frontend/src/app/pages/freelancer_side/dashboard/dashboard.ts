@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Navbar } from '../../../components/navbar/navbar';
 import { FreelancerBackground } from '../freelancer-background';
+import { AuthService } from '../../../core/services/auth.service';
 
 export interface DashboardTask {
   name: string;
@@ -19,6 +20,8 @@ export interface DashboardTask {
   styleUrl: './dashboard.css'
 })
 export class FreelancerDashboard {
+
+  
 
   role: 'apprentice' | 'party-master' = 'party-master';
   userName = 'David';
