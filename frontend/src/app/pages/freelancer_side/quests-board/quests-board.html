@@ -8,7 +8,6 @@
 
     <div class="board-layout">
 
-      <!-- LEFT SIDEBAR TABS -->
       <div class="sidebar-tabs">
         <button class="tab-btn" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -20,106 +19,65 @@
         </button>
       </div>
 
-      <!-- RIGHT MAIN AREA -->
       <div class="main-area">
 
-        <!-- ── TASKS TAB ── -->
         @if (activeTab === 'tasks') {
           <div>
             <div class="tracker-header">
               <span>Quest Progress Tracker</span>
-              @if (role === 'party-master') {
+              @if (isPartyMaster()) {
                 <button class="add-task-btn"
-                  (click)="tasks.length < 10 ? showAddTask = true : null"
-                  [style.opacity]="tasks.length >= 10 ? '0.5' : '1'"
-                  [title]="tasks.length >= 10 ? 'Maximum 10 tasks reached' : 'Add Task'">
-                  + Add Task ({{ tasks.length }}/10)
+                  (click)="tasks().length < 10 ? showAddTask = true : null"
+                  [style.opacity]="tasks().length >= 10 ? '0.5' : '1'"
+                  [title]="tasks().length >= 10 ? 'Maximum 10 tasks reached' : 'Add Task'">
+                  + Add Task ({{ tasks().length }}/10)
                 </button>
               }
             </div>
             <div class="task-list">
-              @for (task of tasks; track task.name; let i = $index) {
+              @for (task of tasks(); track task._id) {
                 <div class="task-card">
                   <div class="task-icon">
-                    <img [src]="task.image" [alt]="task.name" onerror="this.style.display='none'" />
                     <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                   </div>
                   <div class="task-info">
                     <h3 class="task-name">{{ task.name }}</h3>
-                    <p class="task-quest">{{ task.quest }}</p>
-                    @if (role === 'party-master') {
-                      <p class="task-assignee">Assigned to: {{ task.assignee }}</p>
+                    <p class="task-quest">{{ task.description }}</p>
+                    @if (user()?.role === 'partyMaster') {
+                      <p class="task-assignee">Status: {{ task.status | titlecase }}</p>
                     }
                   </div>
                   <button class="status-btn"
-                    [class]="task.status === 'Completed' ? 'completed-btn' : 'in-progress-btn'">
-                    {{ task.status }}
+                    (click)="isPartyMaster() ? toggleTaskStatus(task) : null"
+                    [class]="task.status === 'done' ? 'completed-btn' : 'in-progress-btn'">
+                    {{ task.status | titlecase }}
                   </button>
-                  @if (role === 'party-master') {
+                  @if (isPartyMaster()) {
                     <div class="task-actions">
-                      <button class="edit-task-btn" (click)="editTask(task, i)">
+                      <button class="edit-task-btn" (click)="openEditModal(task)">
                         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                       </button>
-                      <button class="delete-task-btn" (click)="deleteTask(i)">
+                      <button class="delete-task-btn" (click)="deleteTask(task._id)">
                         <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                       </button>
                     </div>
                   }
                 </div>
+              } @empty {
+                <div class="task-card">
+                  <div class="task-info"><p class="task-quest">No active objectives for this party.</p></div>
+                </div>
               }
             </div>
           </div>
         }
 
-        <!-- ── CHAT TAB (APPRENTICE) ── -->
-        @if (activeTab === 'chat' && role === 'apprentice') {
-          <div class="chat-section">
-            <div class="chat-card">
-              <div class="chat-leader-info">
-                <div class="leader-avatar-lg">
-                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <p class="leader-title">Party #5 — Adventurers of Code</p>
-              </div>
-              <div class="messages-area">
-                <div class="date-divider">— Today —</div>
-                @for (msg of partyMessages; track $index) {
-                  <div class="message-row">
-                    @if (msg.sender === 'party') {
-                      <div class="msg-avatar-sm">{{ msg.initials }}</div>
-                      <div class="msg-left">
-                        <span class="msg-name">{{ msg.name }}</span>
-                        <div class="msg-bubble-left">{{ msg.text }}</div>
-                      </div>
-                    }
-                    @if (msg.sender === 'party-master') {
-                      <div class="msg-right-wrap">
-                        <div class="msg-bubble-right">{{ msg.text }}</div>
-                      </div>
-                      <div class="msg-avatar-sm me-avatar">{{ msg.initials }}</div>
-                    }
-                  </div>
-                }
-              </div>
-              <div class="message-input-row">
-                <button class="attach-btn" disabled>
-                  <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                </button>
-                <input type="text" class="message-input" placeholder="// Type a message..." disabled />
-                <button class="send-btn" disabled>Send</button>
-              </div>
-            </div>
-          </div>
-        }
-
-        <!-- ── CHAT TAB (PARTY MASTER) ── -->
-        @if (activeTab === 'chat' && role === 'party-master') {
+        @if (activeTab === 'chat') {
           <div class="chat-pm-layout">
-
             <div class="members-panel">
               <h3 class="members-title">All Members</h3>
               <div class="member-list">
-                @for (member of members; track member.name) {
+                @for (member of members(); track member.name) {
                   <div class="member-item">
                     <div class="member-avatar">{{ member.initials }}</div>
                     <div class="member-info">
@@ -137,34 +95,24 @@
               </div>
               <div class="messages-area">
                 <div class="date-divider">— Today —</div>
-                @for (msg of pmMessages; track $index) {
-                  <div class="message-row">
-                    @if (msg.sender === 'apprentice' || msg.sender === 'client') {
-                      <div class="msg-avatar-sm" [class.client-avatar]="msg.sender === 'client'">{{ msg.initials }}</div>
-                      <div class="msg-left">
-                        @if (msg.name) { <span class="msg-name">{{ msg.name }}</span> }
-                        <div class="msg-bubble-left">{{ msg.text }}</div>
-                      </div>
-                    }
-                    @if (msg.sender === 'party-master') {
-                      <div class="msg-right-wrap">
-                        <div class="msg-bubble-right">{{ msg.text }}</div>
-                      </div>
-                      <div class="msg-avatar-sm me-avatar">{{ msg.initials }}</div>
-                    }
+                <div class="message-row">
+                  <div class="msg-left">
+                    <div class="msg-avatar-sm">SYS</div>
+                    <div class="msg-left">
+                      <span class="msg-name">System</span>
+                      <div class="msg-bubble-left">Secure communication channel established for quest {{ activeQuestId() || 'ID unavailable' }}.</div>
+                    </div>
                   </div>
-                }
+                </div>
               </div>
               <div class="message-input-row">
                 <button class="attach-btn" disabled>
                   <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </button>
-                <input type="text" class="message-input" placeholder="// Type a message..."
-                  [(ngModel)]="newMessage" />
-                <button class="send-btn" (click)="sendMessage()">Send</button>
+                <input type="text" class="message-input" placeholder="// Chat module restricted..." disabled />
+                <button class="send-btn" disabled>Send</button>
               </div>
             </div>
-
           </div>
         }
 
@@ -172,34 +120,24 @@
     </div>
   </main>
 
-  <!-- ADD/EDIT TASK MODAL -->
   @if (showAddTask) {
-    <div class="modal-overlay" (click)="showAddTask = false">
+    <div class="modal-overlay" (click)="closeModal()">
       <div class="modal" (click)="$event.stopPropagation()">
-        <h3 class="modal-title">{{ editingIndex !== null ? 'Edit Task' : 'Add New Task' }}</h3>
+        <h3 class="modal-title">{{ editingTaskId ? 'Modify Objective' : 'New Objective' }}</h3>
         <div class="modal-form">
           <div class="form-group">
-            <label>Task Name</label>
-            <input type="text" [(ngModel)]="newTask.name" placeholder="Task name" />
+            <label>Objective Name</label>
+            <input type="text" [(ngModel)]="newTaskData.name" placeholder="Objective name" />
           </div>
           <div class="form-group">
-            <label>Quest</label>
-            <input type="text" [(ngModel)]="newTask.quest" placeholder="Quest name" />
-          </div>
-          <div class="form-group">
-            <label>Assign To</label>
-            <select [(ngModel)]="newTask.assignee">
-              <option value="">Select member...</option>
-              @for (m of partyMembers; track m.name) {
-                <option [value]="m.name">{{ m.name }}</option>
-              }
-            </select>
+            <label>Description</label>
+            <input type="text" [(ngModel)]="newTaskData.description" placeholder="Technical details..." />
           </div>
         </div>
         <div class="modal-actions">
-          <button class="cancel-btn" (click)="showAddTask = false">Cancel</button>
-          <button class="submit-btn" (click)="addTask()">
-            {{ editingIndex !== null ? 'Update Task' : 'Add Task' }}
+          <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+          <button class="submit-btn" (click)="saveTask()">
+            {{ editingTaskId ? 'Update Objective' : 'Deploy Objective' }}
           </button>
         </div>
       </div>

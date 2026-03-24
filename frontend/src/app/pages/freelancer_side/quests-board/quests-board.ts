@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
 import { FreelancerBackground } from '../freelancer-background';
-
-export interface Task {
-  name: string; quest: string; image: string;
-  status: 'In Progress' | 'Completed'; assignee: string;
-}
+import { TaskService, Task } from '../../../core/services/task.service';
+import { ProfileService } from '../../../core/services/profile.service';
+import { PartyService } from '../../../core/services/party.service';
+import { QuestService, Quest } from '../../../core/services/quest.service';
 
 export interface Member {
-  name: string; initials: string; role: string;
+  name: string;
+  initials: string;
+  role: string;
 }
 
 @Component({
@@ -21,90 +22,146 @@ export interface Member {
   styleUrl: './quests-board.css'
 })
 export class QuestsBoard {
+  private taskService = inject(TaskService);
+  private profileService = inject(ProfileService);
+  private partyService = inject(PartyService);
+  private questService = inject(QuestService);
 
-  role: 'apprentice' | 'party-master' = 'party-master';
-  activeTab    = 'tasks';
-  showAddTask  = false;
-  newMessage   = '';
-  newTask: Partial<Task> = { name: '', quest: '', assignee: '' };
+  // --- UI State ---
+  activeTab = 'tasks';
+  showAddTask = false;
+  editingTaskId: string | null = null;
+  newTaskData = { name: '', description: '' };
 
-  members: Member[] = [
-    { name: 'John Doe',       initials: 'JD', role: 'Frontend' },
-    { name: 'Jane Smith',     initials: 'JS', role: 'Designer'  },
-    { name: 'David Williams', initials: 'DW', role: 'Backend'   },
-    { name: 'Maria Santos',   initials: 'MS', role: 'Client'    },
-  ];
+  // --- Data Signals ---
+  
+  // 1. Current User (for getting the Party ID)
+  user = this.profileService.currentUser;
 
-  get partyMembers(): Member[] { return this.members.filter(m => m.role !== 'Client'); }
+  // 2. Populated Party Data (from PartyService)
+  partyData = this.partyService.currentParty;
 
-  tasks: Task[] = [
-    { name: 'Setup Project Structure',  quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'Completed',   assignee: 'Jane Smith'     },
-    { name: 'Design UI Wireframes',     quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'Completed',   assignee: 'Jane Smith'     },
-    { name: 'User Authentication',      quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'Completed',   assignee: 'John Doe'       },
-    { name: 'Build Product Listing UI', quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'In Progress', assignee: 'John Doe'       },
-    { name: 'Integrate Database',       quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'Completed',   assignee: 'David Williams' },
-    { name: 'Application of API',       quest: 'E-Commerce Website Development', image: 'images/quest-ecommerce.png', status: 'In Progress', assignee: 'David Williams' },
-  ];
+  currentQuest = signal<Quest | null>(null);
+  
+  // 3. Tasks (from TaskService)
+  tasks = this.taskService.currentQuestTasks;
 
-  partyMessages = [
-    { sender: 'party',        initials: 'JJ', name: 'Jeff Johnson', text: "Hey team, let's sync up on the API integration task. Any blockers?" },
-    { sender: 'party-master', initials: 'DW', name: '',             text: "I'm working on the authentication endpoints. Should be done by tomorrow." },
-    { sender: 'party',        initials: 'JS', name: 'Jane Smith',   text: "I've finished the UI screens for mobile. Ready for review!" },
-    { sender: 'party-master', initials: 'DW', name: '',             text: "Great work Jane! I'll review it after I finish the endpoints." },
-    { sender: 'party',        initials: 'JJ', name: 'Jeff Johnson', text: "Awesome progress everyone! Let's aim to complete all tasks by end of week." },
-  ];
+  // 4. Dynamic Member List (Now uses partyData() signal)
+  members = computed<Member[]>(() => {
+    const party = this.partyData();
+    if (!party) return [];
 
-  pmMessages = [
-    { sender: 'apprentice',   initials: 'JS', name: 'Jane Smith',   text: "Hi! We've completed the UI wireframes and started on the frontend components." },
-    { sender: 'client',       initials: 'MS', name: 'Maria Santos', text: 'Great progress! Please make sure the design matches the specs I sent earlier.' },
-    { sender: 'apprentice',   initials: 'JD', name: 'John Doe',     text: 'Working on the product listing UI now. Should be done by tomorrow.' },
-    { sender: 'party-master', initials: 'DW', name: '',             text: "Thanks everyone! We're on track. Will update you once Milestone 2 is done." },
-  ];
+    const list: Member[] = [];
 
-  editingIndex: number | null = null;
-
-  editTask(task: Task, index: number): void {
-    this.editingIndex = index;
-    this.newTask      = { ...task };
-    this.showAddTask  = true;
-  }
-
-  deleteTask(index: number): void {
-    if (confirm('Are you sure you want to delete this task?')) {
-      this.tasks.splice(index, 1);
+    if (party.partyMaster) {
+      list.push({
+        name: party.partyMaster.fullName,
+        initials: this.generateInitials(party.partyMaster.fullName),
+        role: 'Party Master'
+      });
     }
-  }
 
-  addTask(): void {
-    if (this.newTask.name && this.newTask.assignee) {
-      if (this.editingIndex !== null) {
-        this.tasks[this.editingIndex] = {
-          name:     this.newTask.name!,
-          quest:    this.newTask.quest || 'E-Commerce Website Development',
-          image:    'images/quest-ecommerce.png',
-          status:   this.tasks[this.editingIndex].status,
-          assignee: this.newTask.assignee!
-        };
-        this.editingIndex = null;
-      } else {
-        if (this.tasks.length >= 10) return;
-        this.tasks.push({
-          name:     this.newTask.name!,
-          quest:    this.newTask.quest || 'E-Commerce Website Development',
-          image:    'images/quest-ecommerce.png',
-          status:   'In Progress',
-          assignee: this.newTask.assignee!
+    party.apprentices?.forEach((app: any) => {
+      list.push({
+        name: app.fullName,
+        initials: this.generateInitials(app.fullName),
+        role: 'Apprentice'
+      });
+    });
+
+    return list;
+  });
+
+  // 5. Reactive Checks
+  isInGroup = computed(() => !!this.user()?.currentParty);
+  
+  activeQuestId = computed(() => {
+    const party = this.partyData();
+    // Handles both populated object or raw ID string
+    return party?.activeQuest?._id || party?.activeQuest || null;
+  });
+
+  isPartyMaster = computed(() => this.user()?.role === 'partyMaster');
+
+  constructor() {
+    // 6. CHAINED EFFECT: 
+    // User Loads -> Get Party ID -> Fetch Party Details -> Fetch Tasks
+    effect(() => {
+      const userParty = this.user()?.currentParty;
+      const partyId = typeof userParty === 'string' ? userParty : userParty?._id;
+
+      if (partyId) {
+        // First, fetch the party details
+        this.partyService.fetchPartyDetails(partyId).subscribe(party => {
+          
+          // 3. LOGIC RECOVERY: 
+          // If party.activeQuest is null, try to find it via questService
+          if (!party.activeQuest) {
+            this.questService.getQuestsByParty(partyId).subscribe(quests => {
+              // Find the quest that is 'in_progress'
+              const active = quests.find(q => q.status === 'in_progress');
+              if (active) {
+                this.currentQuest.set(active);
+                this.taskService.getTasksByQuest(active._id).subscribe();
+              }
+            });
+          } else {
+            // Standard flow: Party already has the quest ID linked
+            const qId = party.activeQuest._id || party.activeQuest;
+            this.taskService.getTasksByQuest(qId).subscribe();
+          }
         });
       }
-      this.newTask     = { name: '', quest: '', assignee: '' };
-      this.showAddTask = false;
+    }, { allowSignalWrites: true });
+  }
+
+  // --- Actions ---
+  saveTask(): void {
+    const questId = this.activeQuestId();
+    if (!this.newTaskData.name || !questId) return;
+
+    if (this.editingTaskId) {
+      this.taskService.updateTask(this.editingTaskId, this.newTaskData).subscribe(() => this.closeModal());
+    } else {
+      this.taskService.createTask(questId, this.newTaskData).subscribe(() => this.closeModal());
     }
   }
 
-  sendMessage(): void {
-    if (this.newMessage.trim()) {
-      this.pmMessages.push({ sender: 'party', initials: 'ME', name: 'You', text: this.newMessage.trim() });
-      this.newMessage = '';
+  toggleTaskStatus(task: Task): void {
+    const newStatus = task.status === 'done' ? 'todo' : 'done';
+    this.taskService.updateTask(task._id, { status: newStatus }).subscribe();
+  }
+
+  deleteTask(taskId: string): void {
+    if (confirm('Permanently remove this objective?')) {
+      this.taskService.deleteTask(taskId).subscribe();
     }
+  }
+
+  // --- Helpers ---
+  private generateInitials(name: any): string {
+    const nameStr = String(name || '').trim();
+    if (!nameStr) return '??';
+
+    const parts = nameStr.split(/\s+/);
+
+    const firstChar = parts[0]?.charAt(0) || '';
+    const lastChar = parts.length > 1 
+      ? parts[parts.length - 1].charAt(0) 
+      : '';
+
+    return (firstChar + lastChar).toUpperCase() || '??';
+  }
+
+  openEditModal(task: Task) {
+    this.editingTaskId = task._id;
+    this.newTaskData = { name: task.name, description: task.description };
+    this.showAddTask = true;
+  }
+
+  closeModal() {
+    this.showAddTask = false;
+    this.editingTaskId = null;
+    this.newTaskData = { name: '', description: '' };
   }
 }

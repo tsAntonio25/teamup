@@ -18,7 +18,7 @@ export interface User {
   phoneNum?: string;
   location?: string;
   professionalInfo: ProfessionalInfo;
-  currentParty?: string | null;
+  currentParty?: string | {_id: string } | null;
   createdAt?: string;
   updatedAt?: string;
 }

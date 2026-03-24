@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal, computed, } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -10,6 +10,17 @@ export class PartyService {
   // setup connection
   private readonly http = inject(HttpClient);
   private readonly API = `${environment.apiUrl}/parties`;
+
+  // 1. Create a signal to hold the "Rich" party data
+  private readonly _currentParty = signal<any | null>(null);
+  readonly currentParty = this._currentParty.asReadonly();
+
+  // 2. Add a method to fetch fully populated details
+  fetchPartyDetails(partyId: string): Observable<any> {
+    return this.http.get<any>(`${this.API}/${partyId}`).pipe(
+      tap(party => this._currentParty.set(party))
+    );
+  }
 
   createParty(partyData: { name: string; description: string; techStack: string[] }): Observable<any> {
     return this.http.post(`${this.API}`, partyData);

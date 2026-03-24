@@ -11,6 +11,11 @@ import { Navbar } from '../../../components/navbar/navbar';
 })
 export class ClientQuestBoard {
 
+  // services need
+  // task, quest, party
+
+
+  // tasks
   milestones = [
     { name: 'Milestone 1', description: 'UI Wireframes',        status: 'Completed'   },
     { name: 'Milestone 2', description: 'Frontend Development', status: 'In Progress' },
@@ -18,6 +23,7 @@ export class ClientQuestBoard {
     { name: 'Milestone 4', description: 'Final Testing',        status: 'Pending'     },
   ];
 
+  // party members and time created task
   activityLogs = [
     { initials: 'JJ', text: 'Jeff Johnson submitted Milestone 2 for review.',              time: '5 mins ago'  },
     { initials: 'PTY', text: 'Party updated quest progress to 65%',                         time: '20 mins ago' },
@@ -26,6 +32,7 @@ export class ClientQuestBoard {
     { initials: 'ME', text: 'You approved UI Wireframes for Milestone 1',                  time: '2 days ago'  },
   ];
 
+  // do not remove
   messages = [
     { sender: 'party',  initials: 'JJ', name: 'Jeff Johnson', text: 'Hey, just finished the wireframes for the dashboard. Can you check and approve them?' },
     { sender: 'client', initials: 'ME', name: 'You',          text: 'Looks great! The layout is clean. Approved. You can proceed to frontend development.' },
