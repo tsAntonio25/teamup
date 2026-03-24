@@ -1,66 +1,85 @@
-import { AdminBackground } from '../admin-background';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AdminBackground } from '../admin-background';
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
 import { AdminHeader } from '../../../components/admin-header/admin-header';
 import { Footer } from '../../../components/footer/footer';
 import { UsersFilter } from './users-filter/users-filter';
 import { UsersTable } from './users-table/users-table';
-
-export interface User {
-  name: string;
-  avatar: string;
-  role: 'Freelancer' | 'Client';
-  email: string;
-  level?: number;
-  rank?: 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
-  status: 'Active' | 'Suspended';
-}
+import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
   selector: 'app-admin-users',
-  imports: [AdminBackground, CommonModule, AdminSidebar, AdminHeader, Footer, UsersFilter, UsersTable],
+  standalone: true,
+  imports: [
+    AdminBackground, 
+    CommonModule, 
+    AdminSidebar, 
+    AdminHeader, 
+    Footer, 
+    UsersFilter, 
+    UsersTable,
+  ],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css'
 })
-export class AdminUsers {
+  
+  
+export class AdminUsers implements OnInit {
+  private adminService = inject(AdminService);
+  searchTerm = signal<string>('');
+  selectedRole = signal<string>('all');
+  
+  dashboardStats = this.adminService.dashboardStats;
+  users = this.adminService.users; 
 
-  stats = [
-    { icon: '👥', label: 'Total Users',       value: '1,250' },
-    { icon: '🧑‍💻', label: 'Total Freelancers', value: '850'   },
-    { icon: '📋', label: 'Total Quest',        value: '320'   },
-  ];
+  stats = computed(() => {
+    const s = this.dashboardStats();
+    return [
+      { icon: '👥', label: 'Total Users',       value: s?.totalUsers?.toLocaleString() ?? '0' },
+      { icon: '🧑‍💻', label: 'Total Freelancers', value: s?.totalFreelancers?.toLocaleString() ?? '0' },
+      { icon: '📋', label: 'Total Quests',      value: s?.totalQuests?.toLocaleString() ?? '0' },
+    ];
+  });
 
-  users: User[] = [
-    { name: 'John Doe',       avatar: 'JD', role: 'Freelancer', email: 'john@email.com',    level: 5,  rank: 'Bronze',   status: 'Active'    },
-    { name: 'Jane Smith',     avatar: 'JS', role: 'Client',     email: 'jane@email.com',                                  status: 'Suspended' },
-    { name: 'Sarah Brown',    avatar: 'SB', role: 'Freelancer', email: 'sarah@email.com',   level: 8,  rank: 'Silver',   status: 'Active'    },
-    { name: 'David Williams', avatar: 'DW', role: 'Freelancer', email: 'david@email.com',   level: 12, rank: 'Gold',     status: 'Active'    },
-    { name: 'Jeff Johnson',   avatar: 'JJ', role: 'Freelancer', email: 'jeff@email.com',    level: 15, rank: 'Platinum', status: 'Active'    },
-    { name: 'Alice Cooper',   avatar: 'AC', role: 'Freelancer', email: 'alice@email.com',   level: 7,  rank: 'Silver',   status: 'Suspended' },
-    { name: 'Rachel Brewer',  avatar: 'RB', role: 'Client',     email: 'rachel@email.com',                                status: 'Active'    },
-    { name: 'Michael Clarke', avatar: 'MC', role: 'Client',     email: 'michael@email.com',                               status: 'Active'    },
-  ];
+  ngOnInit(): void {
+    console.log('Initializing User Registry...');
+        this.adminService.getDashboardStats().subscribe({
+      next: (data) => console.log('Stats Loaded:', data),
+      error: (err) => console.error('Stats Error:', err)
+    });
 
-  filteredUsers: User[] = [...this.users];
+    this.loadFilteredUsers();
+  }
 
-  private searchTerm = '';
-  private selectedRole = 'All Roles';
+  refreshData(): void {
+    this.adminService.getDashboardStats().subscribe();
+    this.loadFilteredUsers();
+  }
 
   onSearchChange(term: string): void {
-    this.searchTerm = term;
+    this.searchTerm.set(term);
+    this.loadFilteredUsers();
   }
+
 
   onRoleChange(role: string): void {
-    this.selectedRole = role;
+    const lowerRole = role.toLowerCase();
+    let roleSlug = 'all';
+
+    if (lowerRole.includes('freelancer')) {
+      roleSlug = 'partyMaster'; 
+    } else if (lowerRole.includes('client')) {
+      roleSlug = 'commissioner';
+    }
+    
+    this.selectedRole.set(roleSlug);
+    this.loadFilteredUsers();
   }
 
-  applyFilter(): void {
-    this.filteredUsers = this.users.filter(u => {
-      const matchesSearch = u.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-        || u.email.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesRole = this.selectedRole === 'All Roles' || u.role === this.selectedRole;
-      return matchesSearch && matchesRole;
+  private loadFilteredUsers(): void {
+    this.adminService.getUsers(this.selectedRole(), this.searchTerm()).subscribe({
+      error: (err) => console.error('Registry Sync Failed:', err)
     });
   }
 }

@@ -5,12 +5,12 @@
     <app-admin-header></app-admin-header>
     <div class="content">
 
-      <!-- Welcome Banner -->
       <div class="welcome-banner">
+        <div class="wb-scanlines"></div>
         <div>
           <div class="wb-eyebrow"><span class="wb-ping"></span> ADMIN PORTAL — SYSTEM ONLINE</div>
           <h1 class="wb-title">Welcome back, <span class="wb-accent">Admin</span></h1>
-          <p class="wb-sub">All systems operational. Monitor your platform below.</p>
+          <p class="wb-sub">All systems operational. Monitor your platform intelligence below.</p>
         </div>
         <div class="wb-hud">
           <div class="hud-ring"></div>
@@ -20,9 +20,8 @@
         </div>
       </div>
 
-      <!-- Stat Cards -->
       <div class="stat-grid">
-        @for (stat of stats; track stat.label) {
+        @for (stat of stats(); track stat.label) {
           <div class="stat-card">
             <div class="stat-card__icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -37,7 +36,7 @@
                   <rect x="2" y="7" width="20" height="14" rx="2"/>
                   <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
                 }
-                @if (stat.label === 'Total Quest') {
+                @if (stat.label === 'Total Quests') {
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 }
@@ -52,15 +51,13 @@
         }
       </div>
 
-      <!-- Charts -->
       <div class="charts-row">
         <div class="chart-card">
           <div class="chart-card__top">
             <span class="chart-dot"></span>
             <span class="chart-title">User Growth</span>
             <div class="chart-legend">
-              <span class="legend-item"><span class="dot" style="background:#a855f7"></span>Freelancers</span>
-              <span class="legend-item"><span class="dot" style="background:#f472b6"></span>Clients</span>
+              <span class="legend-item"><span class="dot" style="background:#a855f7"></span>Growth Log</span>
             </div>
           </div>
           <div class="chart-wrap"><canvas id="growthChart"></canvas></div>
@@ -68,20 +65,18 @@
         <div class="chart-card">
           <div class="chart-card__top">
             <span class="chart-dot chart-dot--pink"></span>
-            <span class="chart-title">Quest Status</span>
+            <span class="chart-title">Quest Distribution</span>
             <div class="chart-legend">
-              <span class="legend-item"><span class="dot" style="background:#c084fc"></span>Active</span>
-              <span class="legend-item"><span class="dot" style="background:#f472b6"></span>Done</span>
+              <span class="legend-item"><span class="dot" style="background:#f472b6"></span>Live Quests</span>
             </div>
           </div>
           <div class="chart-wrap"><canvas id="questChart"></canvas></div>
         </div>
       </div>
 
-      <!-- Bottom Row -->
       <div class="bottom-row">
         <div class="mini-stats">
-          @for (mini of miniStats; track mini.label) {
+          @for (mini of miniStats(); track mini.label) {
             <div class="mini-card">
               <div class="mini-card__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -110,17 +105,22 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-            Recent Activities
+            System Status Log
           </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead>
-                <tr><th>User</th><th>Activity</th><th>Date</th></tr>
+                <tr><th>Origin</th><th>Transmission</th><th>Timestamp</th></tr>
               </thead>
               <tbody>
                 @for (act of activities; track act.user) {
                   <tr>
-                    <td><div class="user-cell"><div class="user-avatar">{{ act.initials }}</div><span>{{ act.user }}</span></div></td>
+                    <td>
+                      <div class="user-cell">
+                        <div class="user-avatar">{{ act.initials }}</div>
+                        <span>{{ act.user }}</span>
+                      </div>
+                    </td>
                     <td class="activity-cell">{{ act.activity }}</td>
                     <td class="date-cell">{{ act.date }}</td>
                   </tr>

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Quest } from '../admin-quest';
+import { Quest } from '../../../../core/services/quest.service';
 
 @Component({
   selector: 'app-quest-table',
@@ -9,6 +9,21 @@ import { Quest } from '../admin-quest';
   templateUrl: './quest-table.html',
   styleUrl: './quest-table.css'
 })
+  
 export class QuestTable {
-  @Input() quests: Quest[] = [];
+  @Input() quests: any[] = []; 
+
+  formatStatusClass(status: string): string {
+    return status.toLowerCase().replace('_', '-');
+  }
+
+  getClientName(commissioner: any): string {
+    if (!commissioner) return 'Unknown Client';
+    return typeof commissioner === 'object' ? commissioner.fullName : 'Loading...';
+  }
+
+  getPartyName(party: any): string {
+    if (!party) return 'No Party Assigned';
+    return typeof party === 'object' ? (party.name || 'Active Party') : 'Assigned';
+  }
 }
