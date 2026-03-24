@@ -38,8 +38,11 @@
       </div>
       
       @if (user()?.role === 'partyMaster') {
-        <button class="create-btn" (click)="showCreateParty = true">
-          <span class="plus-icon">+</span> Create Party
+        <button class="create-btn" 
+                [disabled]="!!user()?.currentParty" 
+                (click)="showCreateParty = true">
+          <span class="plus-icon">+</span> 
+          {{ user()?.currentParty ? 'In a Party' : 'Create Party' }}
         </button>
       }
     </div>

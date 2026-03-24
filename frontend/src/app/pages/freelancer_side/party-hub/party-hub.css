@@ -354,3 +354,44 @@
 }
 
 .submit-btn:hover { filter: brightness(1.1); }
+
+
+/* --- Create Party Button Disabled State --- */
+.create-btn:disabled {
+  filter: grayscale(1) brightness(0.5);
+  background: #1a142e; 
+  border: 1px solid #3f3564;
+  color: #635b7a;
+  box-shadow: none;
+  cursor: not-allowed;
+  pointer-events: none; 
+  opacity: 0.7;
+}
+
+.create-btn:disabled .plus-icon {
+  color: #635b7a;
+  background: transparent;
+}
+
+.join-btn:disabled {
+  background: #1a142e;
+  border-color: #3f3564;
+  color: #635b7a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.lock-notice {
+  display: block;
+  color: #a855f7;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.create-action-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}

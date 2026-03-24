@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
 import { FreelancerBackground } from '../freelancer-background';
-import { PartyService } from '../../../core/services/party.service'; // Adjust path
+import { PartyService } from '../../../core/services/party.service';
 import { ProfileService } from '../../../core/services/profile.service';
 
 @Component({
@@ -17,21 +17,24 @@ export class PartyHub implements OnInit {
   private partyService = inject(PartyService);
   private profileService = inject(ProfileService);
 
-  // Use a Signal for the parties list to stay reactive
   parties = signal<any[]>([]);
   searchTerm = signal('');
   
-  // User info for role-based actions (like checking if they can create a party)
+  // Reactive user data from ProfileService
   user = this.profileService.currentUser;
 
-  // Computed signal: Automatically filters whenever 'parties' or 'searchTerm' changes
+  // Search logic remains the same
   filteredParties = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.parties().filter(p => 
       p.name.toLowerCase().includes(term) || 
-      p.description.toLowerCase().includes(term)
+      p.description.toLowerCase().includes(term) ||
+      p.techStack?.some((t: string) => t.toLowerCase().includes(term))
     );
   });
+
+  showCreateParty = false;
+  newParty = { name: '', description: '', techStack: '' };
 
   ngOnInit(): void {
     this.loadParties();
@@ -49,23 +52,32 @@ export class PartyHub implements OnInit {
     this.searchTerm.set(value);
   }
 
+
   joinParty(partyId: string): void {
+    if (this.user()?.currentParty) {
+      alert("Contract Denied: You are already assigned to an active party.");
+      return;
+    }
+
     this.partyService.joinParty(partyId).subscribe({
       next: (res) => {
-        alert(res.message);
-        this.loadParties(); // Refresh list to show updated member counts
+        alert("Success: You have joined the formation.");
+        this.profileService.fetchProfile().subscribe();
+        this.loadParties(); 
       },
-      error: (err) => alert(err.error.message)
+      error: (err) => alert(err.error.message || "Failed to join party.")
     });
   }
 
-  // Create Party logic
-  showCreateParty = false;
-  newParty = { name: '', description: '', techStack: '' };
 
   createParty(): void {
+    // Technical Guard: Double check user status
+    if (this.user()?.currentParty) {
+      alert("Deployment Locked: Dissolve your current party before creating a new one.");
+      return;
+    }
+
     if (this.newParty.name && this.newParty.description) {
-      // Convert skills string into an array for the backend
       const partyData = {
         ...this.newParty,
         techStack: this.newParty.techStack.split(',').map(s => s.trim())
@@ -73,11 +85,14 @@ export class PartyHub implements OnInit {
 
       this.partyService.createParty(partyData).subscribe({
         next: () => {
-          this.loadParties(); // Refresh list
+          // 1. Sync profile to lock the "Create" button
+          this.profileService.fetchProfile().subscribe();
+          // 2. Refresh local list
+          this.loadParties(); 
           this.showCreateParty = false;
           this.newParty = { name: '', description: '', techStack: '' };
         },
-        error: (err) => alert(err.error.message)
+        error: (err) => alert(err.error.message || "Failed to launch party.")
       });
     }
   }
