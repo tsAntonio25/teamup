@@ -1,56 +1,61 @@
 <div class="page-wrapper">
-
   <app-navbar />
   <client-bg />
 
   <main class="content">
-
     <h1 class="page-title">Quest Intelligence Board</h1>
 
-    <!-- Quest Card -->
     <div class="quest-card">
-      <div class="quest-card-logo" style="display:none" #logoWrap>
-        <img src="images/angular-dashboard.png" alt="Quest Logo" onerror="this.style.display='none'" />
-      </div>
       <div class="quest-card-info">
-        <h2 class="quest-card-title">Angular Dashboard Development</h2>
-        <p class="quest-card-party">// Party #5 — Adventurers of Code</p>
+        <h2 class="quest-card-title">{{ activeQuest()?.title || 'Identifying Mission...' }}</h2>
+        
+        <p class="quest-card-party">
+          // Formation: {{ activePartyName() || "None"}}
+        </p>
+        
         <div class="quest-card-leader">
-          <div class="leader-avatar">JJ</div>
+          <div class="leader-avatar">{{ generateInitials(partyMasterName()) }}</div>
           <div class="leader-details">
-            <span class="leader-name">Jeff Johnson</span>
+            <span class="leader-name">{{ partyMasterName() }}</span>
             <div class="progress-row">
               <div class="progress-bar">
-                <div class="progress-fill" style="width: 65%"></div>
+                <div class="progress-fill" [style.width.%]="questProgress()"></div>
               </div>
-              <span class="progress-label">65%</span>
+              <span class="progress-label">{{ questProgress() }}%</span>
             </div>
           </div>
         </div>
+        
         <div class="quest-card-meta">
-          <span>Deadline: March 30, 2026</span>
-          <span class="quest-status">Status: In Progress</span>
+          <span>Deadline: {{ activeQuest()?.deadline | date:'MMMM d, y' }}</span>
+          <span class="quest-status">Status: {{ activeQuest()?.status | titlecase }}</span>
         </div>
       </div>
-      <div class="quest-card-budget">₱18,000</div>
+
+      <div class="quest-actions">
+        <button 
+          class="complete-quest-btn" 
+          [disabled]="questProgress() < 100"
+          (click)="onCompleteQuest()"
+          [title]="questProgress() < 100 ? 'All objectives must be resolved first' : 'Mark quest as finished'">
+          Complete Quest
+        </button>
+      </div>
     </div>
 
-    <!-- Middle Row -->
     <div class="middle-row">
-
-      <!-- Milestone Table -->
       <div class="milestone-section">
-        <h3 class="section-title">Milestones</h3>
+        <h3 class="section-title">Tasks</h3>
         <table class="milestone-table">
           <thead>
             <tr>
-              <th>Milestone</th>
+              <th>Task</th>
               <th>Description</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            @for (m of milestones; track m.name) {
+            @for (m of milestones(); track m.name) {
               <tr>
                 <td>{{ m.name }}</td>
                 <td>{{ m.description }}</td>
@@ -60,42 +65,25 @@
                   </span>
                 </td>
               </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="empty-state">No active objectives assigned.</td>
+              </tr>
             }
           </tbody>
         </table>
       </div>
-
-      <!-- Activity Log -->
-      <div class="activity-section">
-        <div class="activity-header">
-          <h3 class="section-title">Activity Log</h3>
-          <div class="activity-divider"></div>
-          <a routerLink="/client/quest-board" class="view-all">View All</a>
-        </div>
-        <div class="activity-list">
-          @for (log of activityLogs; track $index) {
-            <div class="activity-item">
-              <div class="activity-avatar">{{ log.initials }}</div>
-              <div class="activity-content">
-                <p class="activity-text">{{ log.text }}</p>
-              </div>
-              <span class="activity-time">{{ log.time }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
     </div>
 
-    <!-- Chat Log -->
+    @if (activeQuest()) {
     <div class="chat-section">
       <h3 class="section-title">Chat Log</h3>
       <div class="chat-card">
         <div class="chat-leader-info">
-          <div class="leader-avatar-lg">JJ</div>
+          <div class="leader-avatar-lg">{{ generateInitials(partyMasterName()) }}</div>
           <div>
-            <p class="leader-title">Jeff Johnson</p>
-            <p class="leader-role">// Party Leader</p>
+            <p class="leader-title">{{ partyMasterName() }}</p>
+            <p class="leader-role">// Party Representative</p>
           </div>
           <div class="online-status">
             <div class="online-dot"></div>
@@ -104,8 +92,8 @@
         </div>
 
         <div class="messages-area">
-          <div class="date-divider">— Today —</div>
-          @for (msg of messages; track $index) {
+          <div class="date-divider">— Transmission Log —</div>
+          @for (msg of messages(); track $index) {
             <div class="message-row">
               @if (msg.sender === 'party') {
                 <div class="msg-avatar-sm">{{ msg.initials }}</div>
@@ -125,17 +113,11 @@
         </div>
 
         <div class="message-input-row">
-          <button class="attach-btn" disabled>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-            </svg>
-          </button>
-          <input type="text" class="message-input" placeholder="// Type a message..." disabled />
+          <input type="text" class="message-input" placeholder="// Transmissions restricted..." disabled />
           <button class="send-btn" disabled>Send</button>
         </div>
       </div>
     </div>
-
+  }
   </main>
-
 </div>

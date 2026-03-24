@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule} from '@angular/common';
 import { Navbar } from '../../../components/navbar/navbar';
 import { FreelancerBackground } from '../freelancer-background';
 import { ProfileService } from '../../../core/services/profile.service';
@@ -8,7 +8,7 @@ import { PartyService } from '../../../core/services/party.service';
 @Component({
   selector: 'app-freelancer-profile',
   standalone: true,
-  imports: [CommonModule, Navbar, FreelancerBackground, TitleCasePipe],
+  imports: [CommonModule, Navbar, FreelancerBackground],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
