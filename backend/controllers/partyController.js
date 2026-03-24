@@ -186,14 +186,18 @@ export const listParties = async (req, res) => {
 export const getPartyById = async (req, res) => {
     try {
         const party = await Party.findById(req.params.id)
-            .populate("partyMaster", "fullName email")
-            .populate("apprentices", "fullName email")
-            .populate("activeQuest");
+            .populate("partyMaster", "fullName email level")
+            .populate("apprentices", "fullName email level")
+            .populate({
+                path: "activeQuest",
+                populate: {
+                    path: "commissioner",
+                    select: "fullName email"
+                }
+            });
 
         if (!party) {
-            return res.status(404).json({
-                message: "Party not found"
-            });
+            return res.status(404).json({ message: "Party not found" });
         }
 
         res.json(party);
@@ -204,6 +208,7 @@ export const getPartyById = async (req, res) => {
         });
     }
 };
+
 
 // accept quest (POST)
 export const acceptQuest = async (req, res) => {

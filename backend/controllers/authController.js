@@ -104,7 +104,14 @@ export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id)
             .select("-password")
-            .populate("currentParty");
+            .populate({
+                path: "currentParty",
+                populate: [
+                    { path: "partyMaster", select: "fullName email" },
+                    { path: "apprentices", select: "fullName email" },
+                    { path: "activeQuest", select: "title status" }
+                ]
+            });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -119,4 +126,3 @@ export const getProfile = async (req, res) => {
         });
     }
 };
-

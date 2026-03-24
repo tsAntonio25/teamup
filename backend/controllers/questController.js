@@ -49,7 +49,9 @@ export const createQuest = async (req, res) => {
 // list all quests (GET)
 export const listQuests = async (req, res) => {
     try {
-        const quests = await Quest.find().populate("commissioner", "fullName email").sort({ createdAt: -1 });
+        const quests = await Quest.find()
+            .populate("commissioner", "fullName email")
+            .sort({ createdAt: -1 });
 
         res.json(quests);
 
@@ -88,7 +90,15 @@ export const listQuestsByParty = async (req, res) => {
 // get quest details by id (GET)
 export const getQuestById = async (req, res) => {
     try {
-        const quest = await Quest.findById(req.params.id).populate("commissioner", "fullName email");
+        const quest = await Quest.findById(req.params.id)
+            .populate("commissioner", "fullName email")
+            .populate({
+                path: "party",
+                populate: [
+                    { path: "partyMaster", select: "fullName email" },
+                    { path: "apprentices", select: "fullName email" }
+                ]
+            });
 
         if (!quest) {
             return res.status(404).json({ message: "Quest not found" });
@@ -101,7 +111,7 @@ export const getQuestById = async (req, res) => {
             message: "Failed to fetch quest",
             error: error.message
         });
-    }   
+    }
 };
 
 // update quest (PUT)
@@ -136,7 +146,7 @@ export const updateQuest = async (req, res) => {
     }
 };
 
-// complete quest
+// complete quest (POST)
 export const completeQuest = async (req, res) => {
     try {
         const quest = await Quest.findById(req.params.id);

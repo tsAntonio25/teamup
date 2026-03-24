@@ -13,6 +13,7 @@ import { isAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
+// admin user only
 router.use(protect, isAdmin);
 
 // dashboard

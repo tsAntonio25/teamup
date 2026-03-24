@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import Quest from "../models/Quest.js";
 import Party from "../models/Party.js";
 
-// dashboard page info
+// dashboard page info (GET)
 export const getDashboardStats = async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
@@ -36,7 +36,7 @@ export const getDashboardStats = async (req, res) => {
     }
 };
 
-// user growth graph info
+// user growth graph info (GET)
 export const getUserGrowth = async (req, res) => {
     try {
         const users = await User.aggregate([
@@ -63,7 +63,7 @@ export const getUserGrowth = async (req, res) => {
     }
 };
 
-// quest status graph
+// quest status graph (GET)
 export const getQuestStatusStats = async (req, res) => {
     try {
         const stats = await Quest.aggregate([
@@ -85,7 +85,7 @@ export const getQuestStatusStats = async (req, res) => {
     }
 };
 
-// user page (filter)
+// user page (filter) (GET)
 export const getUsers = async (req, res) => {
     try {
         const { role, search } = req.query;
@@ -115,7 +115,7 @@ export const getUsers = async (req, res) => {
     }
 };
 
-// quest page (filter)
+// quest page (filter) (GET)
 export const getQuests = async (req, res) => {
     try {
         const { status, search } = req.query;

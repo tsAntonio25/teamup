@@ -1,6 +1,6 @@
 import { getRepoCommits, getUserTotalCommits } from "../services/githubService.js";
 
-// get commits for a specific quest
+// get commits for a specific quest (GET)
 export const getQuestCommits = async (req, res) => {
     try {
         const { owner, repo, username } = req.params;
@@ -19,7 +19,7 @@ export const getQuestCommits = async (req, res) => {
     }
 };
 
-// get user contributions
+// get user contributions (GET)
 export const getUserContributions = async (req, res) => {
     try {
         const { username } = req.params;

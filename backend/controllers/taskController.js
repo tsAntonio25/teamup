@@ -66,6 +66,13 @@ export const getTasksByQuest = async (req, res) => {
 
         const tasks = await Task.find({ quest: questId })
             .populate("partyMaster", "fullName")
+            .populate({
+                path: "quest",
+                populate: {
+                    path: "party",
+                    select: "name status"
+                }
+            })
             .sort({ createdAt: -1 });
 
         res.json(tasks);
@@ -77,6 +84,7 @@ export const getTasksByQuest = async (req, res) => {
         });
     }
 };
+
 
 // update task (PUT)
 export const updateTask= async (req, res) => {
