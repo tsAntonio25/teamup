@@ -27,7 +27,7 @@ export class FreelancerDashboard implements OnInit {
   showLeaveModal = false;
   role = computed(() => this.user()?.role);
 
-  userName = computed(() => this.user()?.fullName?.split(' ') || 'Freelancer');
+  userName = computed(() => this.user()?.fullName?.split(', ') || 'Freelancer');
   level = computed(() => this.user()?.level || 1);
   exp = computed(() => this.user()?.exp || 0);
   
