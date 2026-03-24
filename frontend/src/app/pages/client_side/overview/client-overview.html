@@ -3,7 +3,6 @@
 
 <div class="db-page">
 
-  <!-- ── Welcome Banner ── -->
   <section class="db-welcome">
     <div class="db-welcome__scanlines"></div>
     <div class="db-welcome__content">
@@ -16,61 +15,54 @@
     </div>
   </section>
 
-  <!-- ── Main Grid ── -->
   <div class="db-grid">
 
-    <!-- ════ LEFT COLUMN ════ -->
     <div class="db-col db-col--left">
 
-      <!-- Active Quest -->
       <div class="db-card">
         <div class="db-card__hud">
           <span class="db-card__hud-dot db-card__hud-dot--pink"></span>
           <span class="db-card__hud-tag">⚔️ ACTIVE QUEST</span>
         </div>
 
-        @if (activeQuest) {
+        @if (activeQuest(); as aq) {
           <div class="aq-img-wrap">
-            <img [src]="activeQuest.img" [alt]="activeQuest.title"
-                 onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80'" />
+            <img [src]="'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80'" [alt]="aq.title" />
             <div class="aq-img-overlay"></div>
-            <div class="aq-difficulty" [class]="activeQuest.difficulty">
+            <div class="aq-difficulty" [class]="aq.techStack.length > 3 ? 'hard' : 'medium'">
               <span class="aq-diff-dot"></span>
-              {{ activeQuest.difficulty | uppercase }}
+              {{ (aq.techStack.length > 3 ? 'hard' : 'medium') | uppercase }}
             </div>
-            <div class="aq-xp-badge">+{{ activeQuest.xp }} XP</div>
+            <div class="aq-xp-badge">+{{ aq.techStack.length * 100 }} XP</div>
           </div>
           <div class="aq-body">
-            <h3 class="aq-title">{{ activeQuest.title }}</h3>
+            <h3 class="aq-title">{{ aq.title }}</h3>
             <p class="aq-client-name">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              {{ activeQuest.client }}
+              {{ isPopulated(aq.party) ? aq.party.name : 'Adventurer Party' }}
             </p>
             <div class="aq-tags">
-              @for (t of activeQuest.techStack; track t) {
+              @for (t of aq.techStack; track t) {
                 <span class="aq-tag">{{ t }}</span>
               }
             </div>
             <div class="aq-meta-row">
               <span class="aq-deadline">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Deadline: {{ activeQuest.deadline }}
+                Deadline: {{ aq.deadline | date:'MMM d, y' }}
               </span>
-              <span class="aq-xp-label">⚡ +{{ activeQuest.xp }} XP</span>
+              <span class="aq-xp-label">⚡ +{{ aq.techStack.length * 100 }} XP</span>
             </div>
-            <a routerLink="/client/quest-hub" class="aq-cta" [class]="activeQuest.difficulty">
-              View Quest →
-            </a>
+            <a routerLink="/client/quest-hub" class="aq-cta">View Quest →</a>
           </div>
         } @else {
           <div class="aq-empty">
-            <p>No active quest yet.</p>
+            <p>No active missions in progress.</p>
             <a routerLink="/client/quest-board" class="aq-cta easy">Browse Quests →</a>
           </div>
         }
       </div>
 
-      <!-- Quick Stats -->
       <div class="db-card">
         <div class="db-card__hud">
           <span class="db-card__hud-dot db-card__hud-dot--purple"></span>
@@ -87,7 +79,7 @@
           <div class="qs-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <div>
-              <span class="qs-val">{{ stats.questsDone }}</span>
+              <span class="qs-val">{{ stats().questsDone }}</span>
               <span class="qs-label">Quests Done</span>
             </div>
           </div>
@@ -101,7 +93,7 @@
           <div class="qs-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
             <div>
-              <span class="qs-val">{{ stats.activeQuests }}</span>
+              <span class="qs-val">{{ stats().activeQuests }}</span>
               <span class="qs-label">Active Quests</span>
             </div>
           </div>
@@ -110,45 +102,49 @@
 
     </div>
 
-    <!-- ════ RIGHT COLUMN ════ -->
     <div class="db-col db-col--right">
 
-      <!-- Quest Progress -->
       <div class="db-card">
         <div class="db-card__hud">
           <span class="db-card__hud-dot db-card__hud-dot--yellow"></span>
-          <span class="db-card__hud-tag">📋 QUEST PROGRESS</span>
+          <span class="db-card__hud-tag">📋 RECENT QUESTS </span>
         </div>
         <div class="qp-list">
-          @for (q of questProgress; track q.id) {
-            <div class="qp-item">
-              <div class="qp-item__top">
-                <span class="qp-item__name">{{ q.title }}</span>
-                <span class="qp-item__pct" [class.done]="q.pct >= 100">{{ q.pct }}%</span>
-              </div>
-              <div class="qp-bar-track">
-                <div class="qp-bar-fill" [class]="q.difficulty" [style.width.%]="q.pct"></div>
-              </div>
-              <div class="qp-item__meta">
-                <span class="qp-item__deadline">📅 Deadline: {{ q.deadline }}</span>
-                <button class="qp-item__btn" [class]="q.difficulty"
-                        routerLink="/client/quest-hub">View</button>
+        @for (q of questProgressList(); track q.id) {
+          <div class="qp-item">
+            <div class="qp-item__top">
+              <span class="qp-item__name">{{ q.title }}</span>
+              <span class="qp-item__pct" [class.done]="q.status === 'completed'">
+                {{ q.status === 'completed' ? 'COMPLETED' : 'IN PROGRESS' }}
+              </span>
+            </div>
+            
+            <div class="qp-bar-track">
+              <div class="qp-bar-fill" 
+                  [class]="q.difficulty" 
+                  [style.width.%]="q.status === 'completed' ? 100 : 50">
               </div>
             </div>
-          } @empty {
-            <p class="qp-empty">No quests in progress.</p>
-          }
-        </div>
+            
+            <div class="qp-item__meta">
+              <span class="qp-item__deadline">📅 Deadline: {{ q.deadline | date:'shortDate' }}</span>
+              <button class="qp-item__btn" [class]="q.difficulty" routerLink="/client/quest-hub">
+                View
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <p class="qp-empty">No missions found in your archive.</p>
+        }
       </div>
-
-      <!-- Milestone Archived -->
+      </div>
       <div class="db-card">
         <div class="db-card__hud">
           <span class="db-card__hud-dot db-card__hud-dot--green"></span>
-          <span class="db-card__hud-tag">🏆 MILESTONE ARCHIVED</span>
+          <span class="db-card__hud-tag">🏆 ACTIVE TASKS</span>
         </div>
         <div class="ms-list">
-          @for (m of milestones; track m.id) {
+          @for (m of milestones(); track m.id) {
             <div class="ms-item" [class.ms-item--done]="m.done">
               <div class="ms-icon" [class.ms-icon--done]="m.done">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -160,9 +156,11 @@
                 <span class="ms-badge">✓ DONE</span>
               }
             </div>
+          } @empty {
+             <p class="qp-empty">No current tasks found.</p>
           }
         </div>
-        <button class="ms-view-all">View All Milestones →</button>
+        <button class="ms-view-all" routerLink="/client/quest-hub">View Quest Tasks →</button>
       </div>
 
     </div>
@@ -171,7 +169,6 @@
 
 </div>
 
-<!-- ── Footer ── -->
 <footer class="db-footer">
   <div class="db-footer__inner">
     <div class="db-footer__brand">
@@ -194,6 +191,6 @@
     </div>
   </div>
   <div class="db-footer__bottom">
-    <p>© 2025 TeamUP. All rights reserved. Built for Angeles City 🇵🇭</p>
+    <p>© 2026 TeamUP. All rights reserved. Built for Angeles City 🇵🇭</p>
   </div>
 </footer>

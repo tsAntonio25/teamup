@@ -1,65 +1,98 @@
-import { ClientBackground } from '../client-background';
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ClientBackground } from '../client-background';
 import { Navbar } from '../../../components/navbar/navbar';
 import { AuthService } from '../../../core/services/auth.service';
+import { QuestService, Quest } from '../../../core/services/quest.service';
+import { TaskService, Task } from '../../../core/services/task.service';
+import { ProfileService } from '../../../core/services/profile.service';
 
 @Component({
   selector: 'app-client-overview',
+  standalone: true,
   imports: [RouterLink, CommonModule, Navbar, ClientBackground],
   templateUrl: './client-overview.html',
   styleUrl: './client-overview.css'
 })
-export class ClientOverview {
+export class ClientOverview implements OnInit {
   private readonly authService = inject(AuthService);
-
-  readonly user      = this.authService.currentUser;
+  private readonly questService = inject(QuestService);
+  private readonly taskService = inject(TaskService);
+  private readonly profileService = inject(ProfileService);
+  readonly user = this.authService.currentUser;
   readonly firstName = computed(() =>
-    this.user()?.fullName?.split(' ')[0] ?? 'Adventurer'
+    this.user()?.fullName?.split(', ') ?? 'Adventurer'
   );
 
-  // ─────────────────────────────────────────────────────────────────
-  // 🔗 BACKEND INTEGRATION POINT
-  //
-  // Replace ALL mock data below with real API calls.
-  //
-  // Suggested endpoints:
-  //   GET /api/quests/active        → activeQuest
-  //   GET /api/quests/progress      → questProgress[]
-  //   GET /api/milestones/current   → milestones[]
-  //   GET /api/users/me/stats       → stats (questsDone, activeQuests)
-  // ─────────────────────────────────────────────────────────────────
+  private readonly allQuests = this.questService.quests; 
+  readonly activeTasks = this.taskService.currentQuestTasks; 
+  readonly clientQuests = computed(() => {
+    const userId = this.user()?._id;
+    return this.allQuests().filter(q => this.getEntityId(q.commissioner) === userId);
+  });
 
-  activeQuest: any = {
-    title:      'Web Portal for Local Cafe',
-    client:     "Kyla's Coffee Co.",
-    difficulty: 'easy',
-    img:        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&q=80',
-    techStack:  ['Angular', 'Node.js', 'MongoDB'],
-    xp:         250,
-    deadline:   'May 15, 2025',
-  };
+  readonly activeQuest = computed(() => {
+    return this.clientQuests().find(q => q.status === 'in_progress') ?? null;
+  });
 
-  stats = {
-    questsDone:   3,
-    activeQuests: 2,
-  };
+  readonly stats = computed(() => {
+    const quests = this.clientQuests();
+    return {
+      questsDone: quests.filter(q => q.status === 'completed').length,
+      activeQuests: quests.filter(q => q.status === 'in_progress' || q.status === 'open').length
+    };
+  });
 
-  questProgress = [
-    { id: 1, title: 'E-Commerce Website Development Tool', pct: 75, difficulty: 'hard',   deadline: 'May 10, 2025' },
-    { id: 2, title: 'Financial Dashboard Backend',         pct: 40, difficulty: 'medium', deadline: 'May 19, 2025' },
-    { id: 3, title: 'Social Media Analytics Tool',         pct: 10, difficulty: 'hard',   deadline: 'May 30, 2025' },
-  ];
+  readonly milestones = computed(() => {
+    return this.activeTasks().map(t => ({
+      id: t._id,
+      label: t.name,
+      done: t.status === 'done'
+    }));
+  });
 
-  milestones = [
-    { id: 1, label: 'Project Planning',    done: true  },
-    { id: 2, label: 'UI Design',           done: true  },
-    { id: 3, label: 'Database Setup',      done: true  },
-    { id: 4, label: 'Backend Integration', done: false },
-    { id: 5, label: 'Testing & QA',        done: false },
-    { id: 6, label: 'Deployment',          done: false },
-  ];
+  readonly questProgressList = computed(() => {
+    return this.clientQuests()
+      .sort((a, b) => b._id.localeCompare(a._id)) 
+      .slice(0, 3)
+      .map(q => ({
+        id: q._id,
+        title: q.title,
+        deadline: q.deadline,
+        status: q.status, 
+        difficulty: q.techStack.length > 3 ? 'hard' : 'medium'
+      }));
+  });
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  private loadDashboardData(): void {
+    this.profileService.fetchProfile().subscribe(u => {
+      if (!u) return;
+      
+      this.questService.getQuests().subscribe(quests => {
+        const active = quests.find(q => 
+          this.getEntityId(q.commissioner) === u._id && q.status === 'in_progress'
+        );
+        
+        if (active) {
+          this.taskService.getTasksByQuest(active._id).subscribe();
+        }
+      });
+    });
+  }
+  
+  private getEntityId(entity: any): string | undefined {
+    if (!entity) return undefined;
+    return typeof entity === 'object' ? entity._id : entity;
+  }
+
+  isPopulated(party: any): party is { name: string } {
+    return !!party && typeof party === 'object' && 'name' in party;
+  }
 
   logout(): void {
     this.authService.logout();
