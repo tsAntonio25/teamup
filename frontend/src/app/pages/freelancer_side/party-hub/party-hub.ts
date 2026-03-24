@@ -19,11 +19,8 @@ export class PartyHub implements OnInit {
 
   parties = signal<any[]>([]);
   searchTerm = signal('');
-  
-  // Reactive user data from ProfileService
   user = this.profileService.currentUser;
 
-  // Search logic remains the same
   filteredParties = computed(() => {
     const term = this.searchTerm().toLowerCase();
     return this.parties().filter(p => 
@@ -71,7 +68,6 @@ export class PartyHub implements OnInit {
 
 
   createParty(): void {
-    // Technical Guard: Double check user status
     if (this.user()?.currentParty) {
       alert("Deployment Locked: Dissolve your current party before creating a new one.");
       return;

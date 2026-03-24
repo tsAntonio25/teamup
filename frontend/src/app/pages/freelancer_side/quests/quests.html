@@ -45,7 +45,7 @@
           
           <div class="quest-info">
             <h3 class="quest-name">{{ quest.title }}</h3>
-            <p class="quest-client">{{ quest.commissioner?.fullName || 'Guild Client' }}</p>
+            <p class="quest-client">{{ (typeof quest.commissioner === 'object') ? quest.commissioner.fullName : 'Guild Client' }}</p>
             
             <div class="quest-meta">
               <div class="tech-stack">
@@ -58,8 +58,22 @@
             </div>
           </div>
           
-          <button class="accept-btn" [disabled]="quest.status !== 'open'">
-            {{ quest.status === 'open' ? 'Accept Quest' : 'Closed' }}
+          <button class="accept-btn" 
+                  [disabled]="quest.status !== 'open' || !canAcceptQuest()"
+                  (click)="acceptQuest(quest._id)">
+            
+            @if (quest.status !== 'open') {
+              Closed
+            } @else if (user()?.role === 'apprentice') {
+              Master Only
+            } @else if (!user()?.currentParty) {
+              Need Party
+            } @else if (userParty()?.activeQuest) {
+              Party Busy
+            } @else {
+              Accept Quest
+            }
+            
           </button>
         </div>
       } @empty {
@@ -79,7 +93,11 @@
                 <h4 class="quest-name">{{ quest.title }}</h4>
                 <p class="quest-meta">{{ quest.techStack.join(', ') }}</p>
               </div>
-              <button class="accept-btn small">View</button>
+              <button class="accept-btn small" 
+                      [disabled]="!canAcceptQuest()"
+                      (click)="acceptQuest(quest._id)">
+                {{ user()?.role === 'apprentice' ? 'Lock' : 'Accept' }}
+              </button>
             </div>
           }
         </div>

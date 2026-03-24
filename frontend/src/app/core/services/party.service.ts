@@ -7,15 +7,11 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class PartyService {
-  // setup connection
   private readonly http = inject(HttpClient);
   private readonly API = `${environment.apiUrl}/parties`;
-
-  // 1. Create a signal to hold the "Rich" party data
   private readonly _currentParty = signal<any | null>(null);
   readonly currentParty = this._currentParty.asReadonly();
 
-  // 2. Add a method to fetch fully populated details
   fetchPartyDetails(partyId: string): Observable<any> {
     return this.http.get<any>(`${this.API}/${partyId}`).pipe(
       tap(party => this._currentParty.set(party))

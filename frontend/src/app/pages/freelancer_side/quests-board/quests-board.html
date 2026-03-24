@@ -1,5 +1,4 @@
 <div class="page-wrapper">
-
   <app-navbar />
   <freelancer-bg />
 
@@ -7,7 +6,6 @@
     <h1 class="page-title">Quests Intelligence Board</h1>
 
     <div class="board-layout">
-
       <div class="sidebar-tabs">
         <button class="tab-btn" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -20,55 +18,79 @@
       </div>
 
       <div class="main-area">
-
         @if (activeTab === 'tasks') {
-          <div>
-            <div class="tracker-header">
-              <span>Quest Progress Tracker</span>
-              @if (isPartyMaster()) {
-                <button class="add-task-btn"
-                  (click)="tasks().length < 10 ? showAddTask = true : null"
-                  [style.opacity]="tasks().length >= 10 ? '0.5' : '1'"
-                  [title]="tasks().length >= 10 ? 'Maximum 10 tasks reached' : 'Add Task'">
-                  + Add Task ({{ tasks().length }}/10)
-                </button>
-              }
+          <div class="quest-intel-header">
+            <div class="intel-pill active-status">
+              <div class="status-indicator">
+                <span class="pulse-ring"></span>
+                <span class="dot"></span>
+              </div>
+              <span class="label">MISSION:</span>
+              <span class="value">{{ currentQuest()?.title || 'PENDING...' }}</span>
             </div>
-            <div class="task-list">
-              @for (task of tasks(); track task._id) {
-                <div class="task-card">
-                  <div class="task-icon">
-                    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                  </div>
-                  <div class="task-info">
-                    <h3 class="task-name">{{ task.name }}</h3>
-                    <p class="task-quest">{{ task.description }}</p>
-                    @if (user()?.role === 'partyMaster') {
-                      <p class="task-assignee">Status: {{ task.status | titlecase }}</p>
-                    }
-                  </div>
-                  <button class="status-btn"
-                    (click)="isPartyMaster() ? toggleTaskStatus(task) : null"
-                    [class]="task.status === 'done' ? 'completed-btn' : 'in-progress-btn'">
-                    {{ task.status | titlecase }}
+
+            <div class="intel-pill repo-status">
+              <svg class="git-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+              </svg>
+              <span class="label">DATABASE:</span>
+              <span class="value">{{ currentQuest()?.githubRepo?.name || 'UNLINKED' }}</span>
+            </div>
+          </div>
+
+          <div class="tracker-header">
+            <span>Quest Progress Tracker</span>
+            @if (isPartyMaster()) {
+              <button class="add-task-btn"
+                [disabled]="tasks().length >= 10 || !currentQuest()"
+                (click)="showAddTask = true">
+                + Add Task ({{ tasks().length }}/10)
+              </button>
+            }
+          </div>
+
+          <div class="task-list">
+            @for (task of tasks(); track task._id) {
+              <div class="task-card" [class.done]="task.status === 'done'">
+                <div class="task-icon" [class.done]="task.status === 'done'">
+                  <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="task-info">
+                  <h3 class="task-name">{{ task.name }}</h3>
+                  <p class="task-quest">{{ task.description }}</p>
+                </div>
+                
+                <div class="task-control-cluster">
+                  <button class="status-pill-cyber"
+                    [disabled]="!isPartyMaster()"
+                    (click)="toggleTaskStatus(task)"
+                    [class.resolved]="task.status === 'done'">
+                    <span class="status-glitch">{{ task.status === 'done' ? 'RESOLVED' : 'TODO' }}</span>
                   </button>
+
                   @if (isPartyMaster()) {
-                    <div class="task-actions">
-                      <button class="edit-task-btn" (click)="openEditModal(task)">
-                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <div class="action-icons-group">
+                      <button class="icon-btn-cyber edit" (click)="openEditModal(task)" title="Modify Objective">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
                       </button>
-                      <button class="delete-task-btn" (click)="deleteTask(task._id)">
-                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+
+                      <button class="icon-btn-cyber delete" (click)="deleteTask(task._id)" title="Terminate Objective">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                        </svg>
                       </button>
                     </div>
                   }
                 </div>
-              } @empty {
-                <div class="task-card">
-                  <div class="task-info"><p class="task-quest">No active objectives for this party.</p></div>
-                </div>
-              }
-            </div>
+              </div> } @empty {
+              <div class="empty-state">
+                <p>Intelligence Board Empty. Deploy new objectives to begin.</p>
+              </div>
+            }
           </div>
         }
 
@@ -115,7 +137,6 @@
             </div>
           </div>
         }
-
       </div>
     </div>
   </main>
