@@ -56,4 +56,8 @@ export class TaskService {
       })
     );
   }
+
+  clearTasks(): void {
+    this._currentQuestTasks.set([]);
+  }
 }

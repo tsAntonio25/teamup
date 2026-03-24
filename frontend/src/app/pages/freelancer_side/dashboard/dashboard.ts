@@ -1,16 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { Navbar } from '../../../components/navbar/navbar';
 import { FreelancerBackground } from '../freelancer-background';
-import { AuthService } from '../../../core/services/auth.service';
-
-export interface DashboardTask {
-  name: string;
-  quest: string;
-  progress: number;
-  due: string;
-}
+import { ProfileService } from '../../../core/services/profile.service';
+import { TaskService, Task } from '../../../core/services/task.service';
+import { PartyService } from '../../../core/services/party.service';
+import { QuestService } from '../../../core/services/quest.service';
 
 @Component({
   selector: 'app-freelancer-dashboard',
@@ -19,34 +15,78 @@ export interface DashboardTask {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class FreelancerDashboard {
+export class FreelancerDashboard implements OnInit {
+  private profileService = inject(ProfileService);
+  private taskService = inject(TaskService);
+  private partyService = inject(PartyService);
+  private questService = inject(QuestService);
+  private router = inject(Router);
 
-  
-
-  role: 'apprentice' | 'party-master' = 'party-master';
-  userName = 'David';
-  expMax = 5000;
-
-  get exp(): number {
-    return this.role === 'party-master' ? 2100 : 950;
-  }
-
-  get level(): number {
-    return this.role === 'party-master' ? 12 : 5;
-  }
-
+  user = this.profileService.currentUser;
+  tasks = this.taskService.currentQuestTasks;
   showLeaveModal = false;
+  role = computed(() => this.user()?.role);
 
-  currentTasks: DashboardTask[] = [
-    { name: 'Task 1 — Build Product Listing UI', quest: 'E-Commerce Website Development', progress: 40, due: 'April 25' },
-    { name: 'Task 2 — Application of API',        quest: 'E-Commerce Website Development', progress: 65, due: 'April 22' },
-    { name: 'Task 3 — Setup Payment Gateway',     quest: 'E-Commerce Website Development', progress: 5,  due: 'May 10'  },
-  ];
+  userName = computed(() => this.user()?.fullName?.split(' ') || 'Freelancer');
+  level = computed(() => this.user()?.level || 1);
+  exp = computed(() => this.user()?.exp || 0);
+  
+  expMax = computed(() => { // wait
+    const lvl = this.level();
+    if (lvl <= 5) return 4000;
+    if (lvl <= 10) return 10000;
+    return 25000;
+  });
 
-  leaveParty(): void  { this.showLeaveModal = true; }
+  expPercentage = computed(() => (this.exp() / this.expMax()) * 100); // wait
+
+  activeTasks = computed(() => {
+    return this.tasks()
+      .filter(t => t.status === 'todo')
+      .slice(0, 3);
+  });
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+    this.taskService.clearTasks();
+  }
+
+  private loadDashboardData(): void {
+    this.profileService.fetchProfile().subscribe(userData => {
+      const partyId = typeof userData?.currentParty === 'object' 
+        ? userData.currentParty?._id 
+        : userData?.currentParty;
+
+      if (partyId) {
+        this.questService.getQuestsByParty(partyId).subscribe(quests => {
+          const activeQuest = quests.find(q => q.status === 'in_progress');
+          if (activeQuest) {
+            this.taskService.getTasksByQuest(activeQuest._id).subscribe();
+          }
+        });
+      }
+    });
+  }
+
+  leaveParty(): void {
+    if (!this.user()?.currentParty) return;
+    this.showLeaveModal = true;
+  }
 
   confirmLeave(): void {
-    this.showLeaveModal = false;
-    this.currentTasks = [];
+    const partyId = typeof this.user()?.currentParty === 'object' 
+      ? (this.user()?.currentParty as any)._id 
+      : this.user()?.currentParty;
+
+    if (partyId) {
+      this.partyService.leaveParty(partyId).subscribe({
+        next: () => {
+          this.showLeaveModal = false;
+          this.profileService.fetchProfile().subscribe();
+          this.router.navigate(['/freelancer/party-hub']);
+        },
+        error: (err) => alert(err.error?.message || "Extraction failed.")
+      });
+    }
   }
 }

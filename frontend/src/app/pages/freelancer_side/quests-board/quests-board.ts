@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, inject, signal, computed, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
@@ -21,11 +21,16 @@ export interface Member {
   templateUrl: './quests-board.html',
   styleUrl: './quests-board.css'
 })
-export class QuestsBoard {
+export class QuestsBoard implements OnInit {
   private taskService = inject(TaskService);
   private profileService = inject(ProfileService);
   private partyService = inject(PartyService);
   private questService = inject(QuestService);
+
+  ngOnInit(): void {
+    this.taskService.clearTasks();
+    this.currentQuest.set(null);
+  }
 
   activeTab = 'tasks';
   showAddTask = false;
@@ -70,22 +75,28 @@ export class QuestsBoard {
 
   constructor() {
     effect(() => {
-      const userParty = this.user()?.currentParty;
+      const user = this.user();
+      const userParty = user?.currentParty;
       const partyId = typeof userParty === 'object' ? userParty?._id : userParty;
 
-      if (partyId) {
-        this.partyService.fetchPartyDetails(partyId).subscribe(party => {
-          this.questService.getQuestsByParty(partyId).subscribe(quests => {
-            const active = quests.find(q => q.status === 'in_progress');
-            if (active) {
-              this.currentQuest.set(active);
-              this.taskService.getTasksByQuest(active._id).subscribe();
-            } else {
-              this.currentQuest.set(null);
-            }
-          });
-        });
+      if (!partyId) {
+        this.taskService.clearTasks();
+        this.currentQuest.set(null);
+        return; 
       }
+
+      this.partyService.fetchPartyDetails(partyId).subscribe(party => {
+        this.questService.getQuestsByParty(partyId).subscribe(quests => {
+          const active = quests.find(q => q.status === 'in_progress');
+          if (active) {
+            this.currentQuest.set(active);
+            this.taskService.getTasksByQuest(active._id).subscribe();
+          } else {
+            this.currentQuest.set(null);
+            this.taskService.clearTasks();
+          }
+        });
+      });
     }, { allowSignalWrites: true });
   }
 
@@ -104,7 +115,7 @@ export class QuestsBoard {
   }
 
   toggleTaskStatus(task: Task): void {
-    if (!this.isPartyMaster()) return; // Apprentice guard
+    if (!this.isPartyMaster()) return; 
     const newStatus = task.status === 'done' ? 'todo' : 'done';
     this.taskService.updateTask(task._id, { status: newStatus }).subscribe();
   }
