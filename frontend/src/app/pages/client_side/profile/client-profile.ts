@@ -1,89 +1,66 @@
 import { ClientBackground } from '../client-background';
-import { Component, computed, signal, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common'; 
 import { Navbar } from '../../../components/navbar/navbar';
 import { AuthService } from '../../../core/services/auth.service';
+import { QuestService } from '../../../core/services/quest.service';
+import { ProfileService } from '../../../core/services/profile.service';
 
 @Component({
   selector: 'app-client-profile',
-  imports: [RouterLink, ReactiveFormsModule, Navbar, ClientBackground],
+  standalone: true,
+  imports: [CommonModule, RouterLink, Navbar, ClientBackground],
   templateUrl: './client-profile.html',
   styleUrl: './client-profile.css'
 })
-export class ClientProfile {
+export class ClientProfile implements OnInit {
+  // Inject the new ProfileService alongside existing ones
+  private readonly profileService = inject(ProfileService);
   private readonly authService = inject(AuthService);
-  private readonly fb          = inject(FormBuilder);
+  private readonly questService = inject(QuestService);
 
-  readonly user      = this.authService.currentUser;
-  readonly firstName = computed(() => this.user()?.fullName?.split(' ')[0] ?? 'Adventurer');
-
-  // ── UI state ──
-  isEditing       = signal(false);
-  isSaving        = signal(false);
-  saveSuccess     = signal(false);
-  showPassForm    = signal(false);
-
-  // ── Notification toggles ──
-  emailNotif      = signal(true);
-  questUpdates    = signal(true);
-  milestoneAlerts = signal(false);
-
-  // ── Toggle methods (arrow functions not allowed in Angular templates) ──
-  toggleEmailNotif():      void { this.emailNotif.update(v => !v); }
-  toggleQuestUpdates():    void { this.questUpdates.update(v => !v); }
-  toggleMilestoneAlerts(): void { this.milestoneAlerts.update(v => !v); }
-  toggleShowPassForm():    void { this.showPassForm.update(v => !v); }
-
-  // ── Edit form ──
-  editForm = this.fb.group({
-    fullName:       [this.user()?.fullName       ?? '', Validators.required],
-    email:          [this.user()?.email          ?? '', [Validators.required, Validators.email]],
-    phoneNum:       [this.user()?.phoneNum        ?? ''],
-    location:       [this.user()?.location        ?? ''],
-    githubUsername: [this.user()?.githubUsername  ?? ''],
-    company:        ['Tech Solutions'],
-    specialization: ['Software Development'],
+  // --- Core Data from ProfileService ---
+  readonly user = this.profileService.currentUser;
+  
+  // Grabs the first name from the full name string
+  readonly firstName = computed(() => 
+    this.user()?.fullName?.split(' ') ?? 'Adventurer'
+  );
+  
+  readonly memberSince = computed(() => {
+    const date = this.user()?.createdAt;
+    return date ? new Date(date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
   });
 
-  // ── Mock stats ──
-  // 🔗 Replace with GET /api/users/me/stats when backend ready
-  stats = { totalQuests: 12, activeQuests: 4, completedQuests: 8, activeParties: 3 };
-
-  rating      = 4.8;
-  ratingCount = 14;
-  memberSince = 'January 2025';
-
-  getStars(): string[] {
-    return Array.from({ length: 5 }, (_, i) =>
-      i < Math.floor(this.rating) ? 'full' : (i < this.rating ? 'half' : 'empty')
+  clientQuests = computed(() => {
+    const userId = this.user()?._id;
+    return this.questService.quests().filter(q => 
+      q.commissioner === userId || q.commissioner?._id === userId
     );
+  });
+
+  liveStats = computed(() => {
+    const q = this.clientQuests();
+    return {
+      total: q.length,
+      active: q.filter(x => x.status === 'open' || x.status === 'in_progress').length,
+      completed: q.filter(x => x.status === 'completed').length,
+      activeParties: [...new Set(q.map(x => x.party).filter(p => !!p))].length 
+    };
+  });
+
+
+  ngOnInit(): void {
+    // 1. Fetch fresh profile data to populate the signal
+    this.profileService.fetchProfile().subscribe();
+    
+    // 2. Fetch quests to populate the hub/stats signals
+    this.questService.getQuests().subscribe();
   }
 
-  onEditToggle(): void {
-    if (this.isEditing()) {
-      this.editForm.patchValue({
-        fullName:       this.user()?.fullName       ?? '',
-        email:          this.user()?.email          ?? '',
-        phoneNum:       this.user()?.phoneNum        ?? '',
-        location:       this.user()?.location        ?? '',
-        githubUsername: this.user()?.githubUsername  ?? '',
-      });
-    }
-    this.isEditing.update(v => !v);
+  // We still use AuthService for session termination
+  logout(): void {
+    this.authService.logout();
   }
-
-  onSave(): void {
-    if (this.editForm.invalid) { this.editForm.markAllAsTouched(); return; }
-    this.isSaving.set(true);
-    // 🔗 PUT /api/users/me when backend ready
-    setTimeout(() => {
-      this.isSaving.set(false);
-      this.saveSuccess.set(true);
-      this.isEditing.set(false);
-      setTimeout(() => this.saveSuccess.set(false), 3000);
-    }, 800);
-  }
-
-  logout(): void { this.authService.logout(); }
 }

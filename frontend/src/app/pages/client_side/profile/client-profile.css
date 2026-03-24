@@ -313,3 +313,49 @@
   .db-welcome__char { display: none; }
   .edit-grid { grid-template-columns: 1fr; }
 }
+
+/* Constrain the meta-icons (Clock and Pin) */
+.profile-meta-item svg {
+  width: 20px;   /* Fixed size */
+  height: 20px;  /* Fixed size */
+  flex-shrink: 0; /* Prevents the icon from squishing */
+  color: #a855f7; /* Matches your purple theme */
+}
+
+/* Fix the layout so text is beside the icon */
+.profile-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  color: #94a3b8;
+}
+
+/* Fix the Terminate Session Button */
+.btn-logout-full {
+  width: 100%;
+  background: rgba(168, 85, 247, 0.1); /* Subtle purple background */
+  border: 1px solid #a855f7;
+  color: #a855f7;
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif; /* Using your sci-fi font */
+  transition: all 0.3s ease;
+}
+
+.btn-logout-full:hover {
+  background: #a855f7;
+  color: white;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+/* Fix the giant icon inside the button */
+.btn-logout-full svg {
+  width: 18px;
+  height: 18px;
+}

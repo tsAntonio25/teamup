@@ -1,13 +1,13 @@
 import { ClientBackground } from '../client-background';
 import { Component, inject, OnInit, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms'; // Updated imports
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Navbar } from '../../../components/navbar/navbar';
 import { QuestService, Quest } from '../../../core/services/quest.service';
 import { PartyService } from '../../../core/services/party.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { AuthService } from '../../../core/services/auth.service'; // Adjust path as needed
 
 @Component({
   selector: 'app-client-quest-hub',
@@ -19,17 +19,29 @@ import { AuthService } from '../../../core/services/auth.service'; // Adjust pat
 export class ClientQuestHub implements OnInit {
   private questService = inject(QuestService);
   private partyService = inject(PartyService);
-  private authService = inject(AuthService); 
+  private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
-  hasActiveQuest = computed(() => {
-  return this.allQuests().some(q => q.status === 'open' || q.status === 'in_progress');
-});
+  // --- Identity Logic ---
+  readonly currentUser = this.authService.currentUser;
 
+  // --- Data Filtering (The fix for account switching) ---
+  readonly myQuests = computed(() => {
+    const userId = this.currentUser()?._id;
+    if (!userId) return [];
+    
+    // Filter the global service signal to only show quests belonging to this user
+    return this.questService.quests().filter(q => 
+      q.commissioner === userId || q.commissioner?._id === userId
+    );
+  });
 
-  allQuests = this.questService.quests;
+  readonly hasActiveQuest = computed(() => {
+    return this.myQuests().some(q => q.status === 'open' || q.status === 'in_progress');
+  });
+
+  // --- UI State ---
   partyNames = signal<Record<string, string>>({});
-
   activeTab = signal('all');
   searchTerm = signal('');
   showCreateModal = signal(false); 
@@ -38,21 +50,20 @@ export class ClientQuestHub implements OnInit {
   selectedQuest = signal<Quest | null>(null);
 
   constructor() {
-      this.questForm = this.fb.group({
-        title: ['', [Validators.required, Validators.minLength(5)]],
-        description: ['', [Validators.required]],
-        techStack: ['', [Validators.required]],
-        deadline: ['', [Validators.required]],
-        // Match the backend's expected flat keys
-        githubRepoOwner: ['', [Validators.required]],
-        githubRepoName: ['', [Validators.required]]
-      });
+    this.questForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(5)]],
+      description: ['', [Validators.required]],
+      techStack: ['', [Validators.required]],
+      deadline: ['', [Validators.required]],
+      githubRepoOwner: ['', [Validators.required]],
+      githubRepoName: ['', [Validators.required]]
+    });
 
+    // Effect to fetch party names only for relevant quests
     effect(() => {
-      const quests = this.allQuests();
+      const quests = this.myQuests();
       const uniquePartyIds = [...new Set(quests.map(q => q.party).filter(id => !!id))] as string[];
       const currentMap = this.partyNames();
-
       const missingIds = uniquePartyIds.filter(id => !currentMap[id]);
 
       if (missingIds.length > 0) {
@@ -65,9 +76,7 @@ export class ClientQuestHub implements OnInit {
         forkJoin(requests).subscribe(parties => {
           this.partyNames.update(map => {
             const newMap = { ...map };
-            parties.forEach(p => {
-              if (p) newMap[p._id] = p.name;
-            });
+            parties.forEach(p => { if (p) newMap[p._id] = p.name; });
             return newMap;
           });
         });
@@ -76,41 +85,42 @@ export class ClientQuestHub implements OnInit {
   }
 
   ngOnInit(): void {
+    // Refresh global list from server
     this.questService.getQuests().subscribe();
   }
 
+  // --- Modal Logic ---
   openCreateModal() {
     if (this.hasActiveQuest()) {
-      alert("System Lock: You have an active objective. Complete it before deploying a new one.");
+      alert("System Lock: Active objective detected. Complete it to unlock deployment.");
       return;
     }
-    
-    this.isEditMode.set(false);
-    this.selectedQuest.set(null);
-    this.questForm.enable();
-    this.questForm.reset();
+    this.resetFormState(false);
     this.showCreateModal.set(true);
   }
 
   openViewModal(quest: Quest) {
-    this.isEditMode.set(false);
-    this.selectedQuest.set(quest);
-    this.questForm.patchValue({
-      title: quest.title,
-      description: quest.description,
-      techStack: quest.techStack.join(', '),
-      deadline: quest.deadline ? new Date(quest.deadline).toISOString().split('T') : '',
-      githubRepoOwner: quest.githubRepo.owner,
-      githubRepoName: quest.githubRepo.name
-    });
+    this.populateForm(quest, false);
     this.questForm.disable(); 
     this.showCreateModal.set(true);
   }
 
   openEditModal(quest: Quest) {
-    this.isEditMode.set(true);
-    this.selectedQuest.set(quest);
+    this.populateForm(quest, true);
     this.questForm.enable(); 
+    this.showCreateModal.set(true);
+  }
+
+  private resetFormState(editMode: boolean) {
+    this.isEditMode.set(editMode);
+    this.selectedQuest.set(null);
+    this.questForm.enable();
+    this.questForm.reset();
+  }
+
+  private populateForm(quest: Quest, editMode: boolean) {
+    this.isEditMode.set(editMode);
+    this.selectedQuest.set(quest);
     this.questForm.patchValue({
       title: quest.title,
       description: quest.description,
@@ -119,15 +129,11 @@ export class ClientQuestHub implements OnInit {
       githubRepoOwner: quest.githubRepo.owner,
       githubRepoName: quest.githubRepo.name
     });
-    this.showCreateModal.set(true);
   }
 
   closeCreateModal() {
     this.showCreateModal.set(false);
-    this.isEditMode.set(false);
-    this.selectedQuest.set(null);
-    this.questForm.enable(); 
-    this.questForm.reset();
+    this.resetFormState(false);
   }
 
   submitQuest() {
@@ -142,22 +148,20 @@ export class ClientQuestHub implements OnInit {
         githubRepoName: val.githubRepoName
       };
 
-      if (this.isEditMode() && this.selectedQuest()) {
-        this.questService.updateQuest(this.selectedQuest()!._id, payload).subscribe({
-          next: () => this.closeCreateModal(),
-          error: (err) => alert("Update failed: " + err.error.message)
-        });
-      } else {
-        this.questService.createQuest({ ...payload, status: 'open' }).subscribe({
-          next: () => this.closeCreateModal(),
-          error: (err) => alert("Deployment failed: " + err.error.message)
-        });
-      }
+      const request = (this.isEditMode() && this.selectedQuest())
+        ? this.questService.updateQuest(this.selectedQuest()!._id, payload)
+        : this.questService.createQuest({ ...payload, status: 'open' });
+
+      request.subscribe({
+        next: () => this.closeCreateModal(),
+        error: (err) => alert("Operation failed: " + err.error.message)
+      });
     }
   }
 
+  // --- Computed Stats & Filtering ---
   stats = computed(() => {
-    const q = this.allQuests();
+    const q = this.myQuests();
     return [
       { label: 'Total Quests', value: q.length.toString(), icon: 'grid' },
       { label: 'In Progress',  value: q.filter(x => x.status === 'in_progress').length.toString(), icon: 'clock' },
@@ -170,15 +174,11 @@ export class ClientQuestHub implements OnInit {
     const term = this.searchTerm().toLowerCase();
     const tab = this.activeTab();
     
-    return this.allQuests().filter(q => {
+    return this.myQuests().filter(q => {
       const matchesSearch = q.title.toLowerCase().includes(term) || 
                             q.description.toLowerCase().includes(term);
       
-      const matchesTab = 
-        tab === 'all' || 
-        (tab === 'progress' && q.status === 'in_progress') ||
-        (tab === 'completed' && q.status === 'completed') ||
-        (tab === 'open' && q.status === 'open');
+      const matchesTab = tab === 'all' || q.status === (tab === 'progress' ? 'in_progress' : tab);
 
       return matchesSearch && matchesTab;
     });
