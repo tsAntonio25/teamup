@@ -7,7 +7,7 @@
     <div class="db-welcome__scanlines"></div>
     <div class="db-welcome__content">
       <p class="db-welcome__greeting">YOUR PROFILE,</p>
-      <h1 class="db-welcome__name">{{ firstName() }}</h1>
+      <h1 class="db-welcome__name">{{ user()?.fullName }}</h1>
       <p class="db-welcome__sub">Review your account details and operational statistics.</p>
     </div>
     <div class="db-welcome__char">
@@ -34,7 +34,7 @@
           </div>
           <h2 class="profile-name">{{ user()?.fullName || 'Adventurer' }}</h2>
           <span class="profile-role-badge">Commissioner</span>
-
+ 
           <div class="profile-meta-list">
             <div class="profile-meta-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

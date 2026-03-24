@@ -15,7 +15,6 @@ import { ProfileService } from '../../../core/services/profile.service';
   styleUrl: './client-profile.css'
 })
 export class ClientProfile implements OnInit {
-  // Inject the new ProfileService alongside existing ones
   private readonly profileService = inject(ProfileService);
   private readonly authService = inject(AuthService);
   private readonly questService = inject(QuestService);
@@ -24,9 +23,10 @@ export class ClientProfile implements OnInit {
   readonly user = this.profileService.currentUser;
   
   // Grabs the first name from the full name string
-  readonly firstName = computed(() => 
-    this.user()?.fullName?.split(' ') ?? 'Adventurer'
-  );
+  readonly firstName = computed(() => {
+    const name = this.user()?.fullName;
+    return name ? name.split(' ') : 'Adventurer';
+  });
   
   readonly memberSince = computed(() => {
     const date = this.user()?.createdAt;
@@ -35,18 +35,36 @@ export class ClientProfile implements OnInit {
 
   clientQuests = computed(() => {
     const userId = this.user()?._id;
-    return this.questService.quests().filter(q => 
-      q.commissioner === userId || q.commissioner?._id === userId
-    );
+    if (!userId) return [];
+    
+    return this.questService.quests().filter(q => {
+      // Handle cases where commissioner might be a string or an object
+      const commId = typeof q.commissioner === 'object' 
+        ? q.commissioner._id 
+        : q.commissioner;
+      return commId === userId;
+    });
   });
 
   liveStats = computed(() => {
     const q = this.clientQuests();
+     
+    // 1. Extract just the IDs of the parties involved in these quests
+    const partyIds = q
+      .map(x => {
+        const p = x.party as any; // Cast as any to handle the populated object
+        // If party is an object, get the _id; otherwise, use the value as is
+        return typeof p === 'object' ? p?._id : p;
+      })
+      .filter(id => !!id); // Remove null/undefined values
+
     return {
       total: q.length,
       active: q.filter(x => x.status === 'open' || x.status === 'in_progress').length,
       completed: q.filter(x => x.status === 'completed').length,
-      activeParties: [...new Set(q.map(x => x.party).filter(p => !!p))].length 
+      
+      // 2. Use the Set on the Array of STRINGS (the IDs)
+      activeParties: [...new Set(partyIds)].length 
     };
   });
 
